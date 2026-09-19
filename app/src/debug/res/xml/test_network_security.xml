@@ -1,0 +1,8 @@
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- Only for on-device integration fixtures. Not included in release. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>
