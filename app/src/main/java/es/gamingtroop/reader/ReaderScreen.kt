@@ -381,8 +381,14 @@ private const val LOCAL = "https://reader.local/"
                         }
                         override fun onPageFinished(view: WebView, url: String) {
                             if(url != LOCAL + "index.html" || web !== view || !alive.get()) return
-                            view.post { view.evaluateJavascript("window.troopViewport && window.troopViewport()", null) }
+                            view.post {
+                                if(web === view && alive.get())
+                                    view.evaluateJavascript("window.troopViewport && window.troopViewport()", null)
+                            }
                             fun painted() {
+                                // JavaScript completion can arrive after rotation or leaving
+                                // the reader. Never call a released WebView from that callback.
+                                if(web !== view || !alive.get()) return
                                 view.postVisualStateCallback(0, object: WebView.VisualStateCallback() {
                                     override fun onComplete(requestId: Long) {
                                         if(web === view && alive.get()) {
