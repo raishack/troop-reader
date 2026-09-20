@@ -64,15 +64,15 @@ object EpubText {
     }
 }
 fun Store.saveNote(note: BookNote) = update { s ->
-    val book = s.chapters[note.chapterId] ?: error("No se encuentra el libro")
+    val book = s.chapters[note.chapterId] ?: error(tr(R.string.tr_119))
     require(book.epub && note.edition.sameEdition(book.chapter) && note.page in 0 until book.chapter.pages)
     require(note.block >= 0 && note.start >= 0 && note.end > note.start && note.quote.isNotBlank() && note.quote.length <= 10000 && note.comment.length <= 4000)
     s.copy(notes = s.notes.filterNot { it.id == note.id } + note)
 }
 fun notesMarkdown(state: LocalState): String = buildString {
-    append("# Notas de Troop Reader\n\n")
+    append(tr(R.string.tr_120))
     for(n in state.notes.sortedBy { it.createdAt }) {
-        append("## ").append(state.chapters[n.chapterId]?.series?.name.orEmpty().replace('\n',' ')).append(" · sección ").append(n.page+1).append("\n\n")
+        append("## ").append(state.chapters[n.chapterId]?.series?.name.orEmpty().replace('\n',' ')).append(tr(R.string.tr_121)).append(n.page+1).append("\n\n")
         append(n.quote.lineSequence().joinToString("\n") { "> $it" }).append("\n\n")
         if(n.comment.isNotBlank()) append(n.comment).append("\n\n")
     }

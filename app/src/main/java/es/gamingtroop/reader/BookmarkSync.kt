@@ -18,7 +18,7 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
                 if(saved.epub) str("title").orEmpty() else "",
                 str(if(saved.epub) "bookScrollId" else "xPath"), str("selectedText"),
                 j["imageOffset"]?.jsonPrimitive?.intOrNull ?: 0)
-            require(remote.id > 0 && remote.page >= 0) { "Respuesta de marcadores incompatible" }
+            require(remote.id > 0 && remote.page >= 0) { tr(R.string.tr_054) }
             remote
         }
     }
@@ -33,7 +33,7 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
         s.copy(bookmarks = s.bookmarks.map { if(it.id == id) block(it) else it })
     }
     private fun conflict(id: String) = update(id) { it.copy(conflict = true,
-        error = "Este marcador también cambió o se eliminó en Kavita. No se ha sobrescrito.") }
+        error = tr(R.string.tr_055)) }
     private fun acknowledge(before: Bookmark, remote: RemoteBookmark?) = store.update { s ->
         s.copy(bookmarks = s.bookmarks.mapNotNull { current ->
             if(current.id != before.id) current
@@ -76,7 +76,7 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
             if(!isCurrent(b) || !store.get().settings.preferLocalChanges) return
             delete(saved, target)
             check(list(saved).none { sameRemoteKey(it, target, saved.epub) }) {
-                "Kavita no confirmó la eliminación del marcador. El cambio local sigue pendiente."
+                tr(R.string.tr_056)
             }
         }
         kotlin.coroutines.coroutineContext.ensureActive()
@@ -84,7 +84,7 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
         if(b.deleted) { acknowledge(b, null); return }
         create(saved, b)
         val confirmed = list(saved).find { sameContent(b, it, saved.epub) }
-        check(confirmed != null) { "Kavita no confirmó el marcador del móvil. Se reintentará sin perderlo." }
+        check(confirmed != null) { tr(R.string.tr_057) }
         acknowledge(b, confirmed)
     }
     suspend fun sync() {
@@ -92,13 +92,13 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
             kotlin.coroutines.coroutineContext.ensureActive()
             try {
                 val chapter = cancellableApiCall { api.get<Chapter>("api/Series/chapter?chapterId=$id") }
-                check(saved.chapter.sameEdition(chapter)) { "La edición cambió. Marcadores conservados sin moverlos a otro archivo." }
+                check(saved.chapter.sameEdition(chapter)) { tr(R.string.tr_058) }
                 var remote = list(saved)
                 val pending = store.get().bookmarks.filter { it.chapterId == id && it.dirty }
                 for (b in pending) {
                     kotlin.coroutines.coroutineContext.ensureActive()
                     if(store.get().bookmarks.find { it.id == b.id }?.revision != b.revision) continue
-                    if(!b.edition.sameEdition(chapter)) { update(b.id) { it.copy(error = "Marcador de otra edición; se conserva sin sincronizar.") }; continue }
+                    if(!b.edition.sameEdition(chapter)) { update(b.id) { it.copy(error = tr(R.string.tr_059)) }; continue }
                     // Re-read immediately before changing a single remote marker.
                     remote = list(saved)
                     if(store.get().bookmarks.find { it.id == b.id }?.revision != b.revision) continue
@@ -115,7 +115,7 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
                         if(current != baseline) { conflict(b.id); continue }
                         delete(saved, current)
                         remote = list(saved)
-                        check(remote.none { it.id == current.id }) { "Kavita no confirmó la eliminación del marcador" }
+                        check(remote.none { it.id == current.id }) { tr(R.string.tr_060) }
                         acknowledge(b, null)
                     } else if (baseline != null) {
                         // A local undo must not resurrect a marker deleted/edited from the web.
@@ -129,7 +129,7 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
                         create(saved, b)
                         remote = list(saved)
                         val confirmed = remote.find { sameContent(b, it, saved.epub) }
-                        check(confirmed != null) { "Kavita no confirmó el nuevo marcador" }
+                        check(confirmed != null) { tr(R.string.tr_061) }
                         acknowledge(b, confirmed)
                     }
                 }
@@ -148,7 +148,7 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
                         if (r.page >= chapter.pages || merged.any { it.chapterId == id && it.remote?.id == r.id }) continue
                         // An unacknowledged local creation with the same contents will be reconciled next sync.
                         if(merged.any { it.chapterId == id && it.dirty && !it.deleted && sameContent(it, r, saved.epub) }) continue
-                        merged += Bookmark("kavita-$id-${r.id}", id, if(saved.epub) r.title else "Página ${r.page+1}",
+                        merged += Bookmark("kavita-$id-${r.id}", id, if(saved.epub) r.title else tr(R.string.tr_062, r.page+1),
                             r.page, if(saved.epub) r.scroll else null, 0, chapter, remote = r, dirty = false)
                     }
                     s.copy(bookmarks = merged, bookmarkIssues = s.bookmarkIssues - id)
@@ -157,7 +157,7 @@ class BookmarkSync(private val store: Store, private val api: KavitaApi) {
             catch (e: Exception) {
                 store.update { it.copy(bookmarkIssues = it.bookmarkIssues + (id to
                     (if(e is ApiError || e is IllegalStateException || e is IllegalArgumentException) e.message.orEmpty()
-                    else "No se pudieron sincronizar los marcadores. Se conservan en este móvil."))) }
+                    else tr(R.string.tr_063)))) }
                 if(e is ApiError && e.status == 401) throw e
             }
         }

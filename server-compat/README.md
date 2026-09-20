@@ -1,29 +1,29 @@
-# Compatibilidad de imágenes de Kavita
+# Kavita image compatibility
 
-Herramientas **opcionales, no oficiales y específicas de versión**. No se ejecutan desde la app y no modifican servidores automáticamente.
+**Optional, unofficial, version-specific tools.** They are not executed by the app and never modify servers automatically.
 
-- `0.9.0.2/patcher`: histórico, cinco parámetros de Reader/Image.
-- `0.9.1.4/patcher`: solo `ReaderController.GetImage(apiKey)`, usado en el update documentado. Las carátulas de esta versión ya están corregidas upstream.
+- `0.9.0.2/patcher`: historical adjustment to five Reader/Image parameters.
+- `0.9.1.4/patcher`: only `ReaderController.GetImage(apiKey)`, used in the documented upgrade. Cover routes are already fixed upstream in that version.
 
-.NET SDK 10.0 y Mono.Cecil 0.11.6. Descarga el paquete oficial de la misma versión/arquitectura y conserva una copia íntegra. **No se distribuye una DLL parcheada ni se copia una DLL de otra versión.**
+Requires .NET SDK 10.0 and Mono.Cecil 0.11.6. Download the official package for the exact version/architecture and preserve a complete copy. **No patched DLL is distributed; never copy a DLL from another version.**
 
-## Procedimiento para 0.9.1.4
+## Procedure for 0.9.1.4
 
-1. Confirmar HTTP400 por parámetro apiKey requerido en imagen con sesión válida. Si funciona, no aplicar nada.
-2. Verificar hash del paquete oficial. Comparar el DLL original con `0.9.1.4/INPUT-SHA256.txt` (referencia del paquete Windows x64 ensayado). Si difiere, detenerse e investigar; los patchers no implementan una allowlist de hashes ni prueban todas las plataformas.
-3. Crear directorio de trabajo con DLL/dependencias originales y otro de salida. Nunca sobrescribir el input.
+1. Confirm HTTP 400 due to a required apiKey parameter on an image request with a valid session. If it works already, do not patch.
+2. Verify the official package hash. Compare the original DLL with `0.9.1.4/INPUT-SHA256.txt` (reference from the tested Windows x64 package). If different, stop and investigate: the patchers do not enforce a hash allowlist or test every platform.
+3. Prepare a working directory with the original DLL/dependencies and a separate output directory. Never overwrite the input.
 
 ```sh
 dotnet run --project server-compat/0.9.1.4/patcher -- /work/original/Kavita.Server.dll /work/output/Kavita.Server.dll
 ```
 
-4. El programa rechaza ensamblados strong-name y comprueba identidad, IL y atributos de métodos. Solo cambia nulabilidad del parámetro; estas comprobaciones no sustituyen pruebas de permisos.
-5. En la copia aislada y detenida, sustituir exclusivamente su DLL por la salida. Arrancar y probar: imagen autenticada 200, anónima 401, usuario sin acceso denegado, carátulas y resto de API. Comprobar también cliente web.
-6. Solo tras ensayo y backup final desplegar el mismo paquete validado según [KAVITA-UPGRADE](../docs/KAVITA-UPGRADE.md). Guardar ambos hashes y revertir instalación/DB coherentes si falla.
+4. The program rejects strong-named assemblies and checks identity, IL and method attributes. It changes only parameter nullability; these checks do not replace permission tests.
+5. Replace only the DLL in the stopped isolated copy. Start it and test: authenticated image 200, anonymous image 401, inaccessible library denied, covers and remaining API. Check the web client too.
+6. Only after rehearsal and final backup, deploy the validated package using [KAVITA-UPGRADE](../docs/KAVITA-UPGRADE.md). Save both hashes; restore a consistent installation/database if anything fails.
 
-## Fixture histórica 0.9.0.2
+## Historical 0.9.0.2 fixture
 
-Prueba local de contrato, no servidor real (ejecutar desde raíz, crear directorio output):
+Local contract test, not a real server; run from repository root:
 
 ```sh
 mkdir -p build/compat-patched
@@ -33,4 +33,4 @@ dotnet run --project server-compat/0.9.0.2/verify -- build/compat-original/Fixtu
 dotnet run --project server-compat/0.9.0.2/verify -- build/compat-patched/Fixture.dll patched
 ```
 
-La fixture simula cinco rutas antiguas; no es una validación de la migración ni del controlador 0.9.1.4 real. Una nueva versión exige reevaluación.
+This fixture simulates five old routes, not the migration or the real 0.9.1.4 controller. Every new version requires reassessment.

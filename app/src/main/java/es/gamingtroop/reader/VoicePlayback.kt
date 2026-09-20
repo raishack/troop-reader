@@ -67,7 +67,7 @@ class VoiceService: Service() {
     override fun onCreate() {
         super.onCreate()
         manager=getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(NotificationChannel("reading-voice","Lectura en voz alta",NotificationManager.IMPORTANCE_LOW))
+        manager.createNotificationChannel(NotificationChannel("reading-voice",tr(R.string.tr_145),NotificationManager.IMPORTANCE_LOW))
         media=MediaSession(this,"Troop Reader").apply {
             setCallback(object: MediaSession.Callback() {
                 override fun onPlay() { voice.resume() }
@@ -101,11 +101,11 @@ class VoiceService: Service() {
         val playing=voice.speaker?.speaking==true
         val open=PendingIntent.getActivity(this,1901,Intent(this,MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         return Notification.Builder(this,"reading-voice").setSmallIcon(android.R.drawable.ic_media_play)
-            .setContentTitle("Troop Reader · Lectura en voz alta")
-            .setContentText("Sección ${voice.page+1} · ${if(playing) "Reproduciendo" else "En pausa"}")
+            .setContentTitle(tr(R.string.tr_592))
+            .setContentText(tr(R.string.tr_595, voice.page+1, if(playing) tr(R.string.tr_593) else tr(R.string.tr_594)))
             .setVisibility(Notification.VISIBILITY_PRIVATE).setContentIntent(open).setOnlyAlertOnce(true).setOngoing(playing)
-            .addAction(Notification.Action.Builder(null,if(playing) "Pausar" else "Reanudar",action("toggle")).build())
-            .addAction(Notification.Action.Builder(null,"Detener",action("stop")).build())
+            .addAction(Notification.Action.Builder(null,if(playing) tr(R.string.tr_150) else tr(R.string.tr_151),action("toggle")).build())
+            .addAction(Notification.Action.Builder(null,tr(R.string.tr_596),action("stop")).build())
             .setStyle(Notification.MediaStyle().setMediaSession(media.sessionToken).setShowActionsInCompactView(0,1)).build()
     }
     override fun onStartCommand(intent: Intent?,flags: Int,startId: Int): Int {

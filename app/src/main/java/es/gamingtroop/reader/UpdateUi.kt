@@ -32,7 +32,7 @@ val LocalOpenUpdates = staticCompositionLocalOf<() -> Unit> { {} }
     val open = LocalOpenUpdates.current
     DisplayIconButton(onClick = open) {
         BadgedBox(badge = { if(state.release != null) Badge() }) {
-            Icon(Icons.Outlined.SystemUpdate, if(state.release == null) "Actualizaciones de la app" else "Nueva versión disponible")
+            Icon(Icons.Outlined.SystemUpdate, if(state.release == null) tr(R.string.tr_022) else tr(R.string.tr_036))
         }
     }
 }
@@ -50,66 +50,66 @@ val LocalOpenUpdates = staticCompositionLocalOf<() -> Unit> { {} }
         scope.launch {
             try { context.startActivity(updates.installerIntent()) }
             catch(e: CancellationException) { throw e }
-            catch(_: Exception) { notice = "No se pudo abrir el instalador. Comprueba el permiso o vuelve a descargar la actualización." }
+            catch(_: Exception) { notice = tr(R.string.tr_567) }
             finally { installing = false }
         }
     }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         canInstall = context.packageManager.canRequestPackageInstalls()
         if(canInstall && state.ready) install()
-        else notice = "Puedes permitir la instalación y volver a intentarlo cuando quieras."
+        else notice = tr(R.string.tr_568)
     }
-    DisplayAlertDialog(onDismissRequest = close, title = { Text("Actualizaciones") }, text = {
+    DisplayAlertDialog(onDismissRequest = close, title = { Text(tr(R.string.tr_569)) }, text = {
         Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling()).testTag("app-updates-panel"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Versión instalada · ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
+            Text(tr(R.string.tr_570, BuildConfig.VERSION_NAME), style = MaterialTheme.typography.bodySmall)
             val release = state.release
             when {
                 release != null -> {
-                    Text("Nueva versión · ${release.versionName}", style = MaterialTheme.typography.titleMedium)
+                    Text(tr(R.string.tr_571, release.versionName), style = MaterialTheme.typography.titleMedium)
                     Text(sizeText(release.sizeBytes), style = MaterialTheme.typography.bodySmall)
                     if(release.notes.isNotBlank()) Text(release.notes)
                     when {
-                        release.minSdk > Build.VERSION.SDK_INT -> Text("Esta versión necesita un Android más reciente. Puedes seguir usando la versión instalada.")
+                        release.minSdk > Build.VERSION.SDK_INT -> Text(tr(R.string.tr_572))
                         state.ready -> {
-                            Text("Lista para instalar. Se conservarán tus descargas, progreso y ajustes.")
-                            if(!canInstall) Text("Android te pedirá permitir instalaciones desde Troop Reader. Después confirma la actualización en el instalador.", style = MaterialTheme.typography.bodySmall)
+                            Text(tr(R.string.tr_573))
+                            if(!canInstall) Text(tr(R.string.tr_574), style = MaterialTheme.typography.bodySmall)
                             DisplayButton(enabled = !installing, onClick = {
                                 canInstall = context.packageManager.canRequestPackageInstalls()
                                 if(canInstall) install() else try {
                                     permission.launch(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${context.packageName}")))
-                                } catch(_: Exception) { notice = "Abre los ajustes de Android y permite instalar aplicaciones desde Troop Reader." }
+                                } catch(_: Exception) { notice = tr(R.string.tr_575) }
                             }, modifier = Modifier.fillMaxWidth().testTag("install-update")) {
-                                Text(if(installing) "Verificando…" else if(canInstall) "Instalar actualización" else "Permitir e instalar")
+                                Text(if(installing) "Verificando…" else if(canInstall) tr(R.string.tr_576) else tr(R.string.tr_577))
                             }
                         }
                         state.downloading -> {
                             DisplayProgress(progress = { state.percent / 100f }, modifier = Modifier.fillMaxWidth())
-                            Text("Descargando actualización · ${state.percent} %")
+                            Text(tr(R.string.tr_578, state.percent))
                         }
                         else -> {
-                            if(state.autoDownload && state.error == null) Text("Se descargará automáticamente en una red Wi‑Fi sin límite de datos.")
-                            DisplayButton(onClick = { confirmData = true }, modifier = Modifier.fillMaxWidth().testTag("download-update")) { Text("Descargar ahora") }
+                            if(state.autoDownload && state.error == null) Text(tr(R.string.tr_579))
+                            DisplayButton(onClick = { confirmData = true }, modifier = Modifier.fillMaxWidth().testTag("download-update")) { Text(tr(R.string.tr_580)) }
                         }
                     }
                 }
-                state.lastChecked > 0 && state.error == null && !state.checking -> Text("Tienes la última versión publicada.")
-                else -> Text("Consulta si hay una nueva versión de Troop Reader.")
+                state.lastChecked > 0 && state.error == null && !state.checking -> Text(tr(R.string.tr_581))
+                else -> Text(tr(R.string.tr_582))
             }
-            if(state.checking) { DisplayProgress(Modifier.fillMaxWidth()); Text("Comprobando · necesita conexión") }
-            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            if(state.checking) { DisplayProgress(Modifier.fillMaxWidth()); Text(tr(R.string.tr_583)) }
+            state.error?.let { Text(localizedStatus(it), color = MaterialTheme.colorScheme.error) }
             notice?.let { Text(it) }
-            if(state.lastChecked > 0) Text("Última comprobación: " + java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT).format(java.util.Date(state.lastChecked)), style = MaterialTheme.typography.bodySmall)
-            DisplayOutlinedButton(onClick = { updates.check(force = true) }, enabled = !state.checking, modifier = Modifier.fillMaxWidth()) { Text("Buscar actualizaciones") }
+            if(state.lastChecked > 0) Text(tr(R.string.tr_584) + java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT, AppLanguage.locale).format(java.util.Date(state.lastChecked)), style = MaterialTheme.typography.bodySmall)
+            DisplayOutlinedButton(onClick = { updates.check(force = true) }, enabled = !state.checking, modifier = Modifier.fillMaxWidth()) { Text(tr(R.string.tr_585)) }
             HorizontalDivider()
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Descargar actualizaciones por Wi‑Fi", Modifier.weight(1f))
-                DisplaySwitch(state.autoDownload, updates::autoDownload, modifier = Modifier.semantics { contentDescription = "Descarga automática de actualizaciones" })
+                Text(tr(R.string.tr_586), Modifier.weight(1f))
+                DisplaySwitch(state.autoDownload, updates::autoDownload, modifier = Modifier.semantics { contentDescription = tr(R.string.tr_587) })
             }
-            Text("Se buscan al abrir la app y periódicamente en segundo plano. Android puede retrasar la comprobación. La instalación siempre requiere tu confirmación y no interrumpe la lectura.", style = MaterialTheme.typography.bodySmall)
+            Text(tr(R.string.tr_588), style = MaterialTheme.typography.bodySmall)
         }
-    }, confirmButton = { DisplayTextButton(onClick = close) { Text("Cerrar") } })
-    if(confirmData) DisplayAlertDialog(onDismissRequest = { confirmData = false }, title = { Text("Descargar actualización") },
-        text = { Text("Se descargarán ${sizeText(state.release?.sizeBytes ?: 0)} usando la conexión actual, incluidos datos móviles si no estás en Wi‑Fi.") },
-        confirmButton = { DisplayTextButton(onClick = { confirmData = false; updates.enqueueDownload(manual = true) }) { Text("Descargar") } },
-        dismissButton = { DisplayTextButton(onClick = { confirmData = false }) { Text("Cancelar") } })
+    }, confirmButton = { DisplayTextButton(onClick = close) { Text(tr(R.string.tr_115)) } })
+    if(confirmData) DisplayAlertDialog(onDismissRequest = { confirmData = false }, title = { Text(tr(R.string.tr_589)) },
+        text = { Text(tr(R.string.tr_590, sizeText(state.release?.sizeBytes ?: 0))) },
+        confirmButton = { DisplayTextButton(onClick = { confirmData = false; updates.enqueueDownload(manual = true) }) { Text(tr(R.string.tr_591)) } },
+        dismissButton = { DisplayTextButton(onClick = { confirmData = false }) { Text(tr(R.string.tr_161)) } })
 }

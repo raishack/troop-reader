@@ -1,9 +1,9 @@
-# Procedencia y licencias
+# Attribution and licensing
 
-Troop Reader es un cliente independiente para Gaming Troop. No está afiliado ni respaldado por Kavita; no usa sus logotipos ni incluye el bundle Angular o el lector web completo.
+Troop Reader is an independent client for Gaming Troop. It is not affiliated with or endorsed by Kavita; it does not use Kavita logos or include its Angular bundle or complete web reader.
 
-Proyecto distribuido bajo GPL-3.0: ver LICENSE. Se consultó el código GPL-3.0 de [Kareadita/Kavita](https://github.com/Kareadita/Kavita), versiones 0.9.0.2 y 0.9.1.4 (commit 6784945a531bebce6b562ac5d8dffd4b945edfa1), para interoperabilidad. Los materiales internos de investigación no se redistribuyen aquí; el código fuente de la app y sus herramientas sí.
+This project is GPL-3.0: see LICENSE. The GPL-3.0 source of [Kareadita/Kavita](https://github.com/Kareadita/Kavita), versions 0.9.0.2 and 0.9.1.4 (commit 6784945a531bebce6b562ac5d8dffd4b945edfa1), was consulted for interoperability. Private research materials are not redistributed here; application and tool source code are.
 
-AndroidX/Compose/WorkManager/WebKit, Kotlin/coroutines/serialization, OkHttp y Coil: Apache-2.0; jsoup: MIT. Pruebas: JUnit (EPL), Robolectric (MIT), MockWebServer (Apache-2.0). Patcher: Mono.Cecil (MIT). Consultar los avisos y versiones de los paquetes al redistribuir. El wrapper Gradle se conserva con sus avisos.
+AndroidX/Compose/WorkManager/WebKit, Kotlin/coroutines/serialization, OkHttp and Coil: Apache-2.0. jsoup: MIT. Tests: JUnit (EPL), Robolectric (MIT), MockWebServer (Apache-2.0). Patcher: Mono.Cecil (MIT). Review dependency notices and versions when redistributing. Gradle wrapper notices are retained.
 
-Demostración y fixtures son sintéticos; no se distribuyen bibliotecas de usuarios ni binarios de Kavita. Los adaptadores e-ink no redistribuyen SDK de fabricantes. Fuentes de investigación en docs/EINK.md.
+Demo data and fixtures are synthetic. No user libraries or Kavita binaries are distributed. The e-ink adapters do not redistribute manufacturer SDKs. Research sources are listed in [EINK](docs/EINK.md).

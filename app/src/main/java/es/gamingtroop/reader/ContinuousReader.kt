@@ -107,13 +107,13 @@ internal data class ImageBounds(val width: Int, val height: Int) {
         }
         if(dimensions.isEmpty()) DisplaySpinner(Modifier.align(Alignment.Center))
         else LazyColumn(state = list,modifier = Modifier.fillMaxSize().testTag("continuous-pages")
-            .semantics { stateDescription = if(positioned) "Lectura continua lista" else "Preparando lectura" }
+            .semantics { stateDescription = if(positioned) tr(R.string.tr_071) else tr(R.string.tr_072) }
             .pointerInput(id) { detectTapGestures(onTap = { latestTap(it.x / size.width.coerceAtLeast(1)) }) }, flingBehavior=displayFling()) {
             items(total,key = { it }) { index ->
                 val bounds = dimensions.getOrNull(index) ?: ImageBounds(0,0)
                 val height = with(density) { bounds.displayHeight(width).toDp() }
                 Box(Modifier.fillMaxWidth().height(height).testTag("continuous-page-$index"),contentAlignment = Alignment.Center) {
-                    if(!bounds.valid) Text("No se puede abrir la página ${index+1}. Vuelve a descargar este tomo.",Modifier.padding(24.dp))
+                    if(!bounds.valid) Text(tr(R.string.tr_073, index+1),Modifier.padding(24.dp))
                     else {
                         var failed by remember(index) { mutableStateOf(false) }
                         val file = File(store.chapterDir(id),"$index.img")
@@ -121,18 +121,18 @@ internal data class ImageBounds(val width: Int, val height: Int) {
                         val request = remember(file,width) { ImageRequest.Builder(context).data(file)
                             .memoryCacheKey("${file.path}:${file.lastModified()}:${size.first}:${size.second}")
                             .size(size.first,size.second).build() }
-                        DisplayImage(request,"Página ${index+1}",Modifier.fillMaxSize(),contentScale = ContentScale.Fit,
+                        DisplayImage(request,tr(R.string.tr_062, index+1),Modifier.fillMaxSize(),contentScale = ContentScale.Fit,
                             onError = { failed = true },onSuccess = { failed = false })
-                        if(failed) Text("No se pudo mostrar esta página. Prueba el modo Página completa.",Modifier.padding(24.dp))
+                        if(failed) Text(tr(R.string.tr_074),Modifier.padding(24.dp))
                     }
                 }
             }
             item(key = "end") {
                 Column(Modifier.fillMaxWidth().heightIn(min = maxHeight).padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(if(saved.readablePages == saved.chapter.pages) "Fin del tomo" else "Esperando más páginas",style = MaterialTheme.typography.titleLarge)
-                    Text(if(saved.readablePages == saved.chapter.pages) "El tomo se marca leído al pulsar Terminado; no al cargar la última imagen." else "${saved.readablePages}/${saved.chapter.pages} disponibles · ${saved.state}")
-                    DisplayButton(onClick = onComplete,enabled = total == saved.chapter.pages && dimensions.all { it.valid },modifier = Modifier.testTag("continuous-finish")) { Text("Terminado · continuar") }
+                    Text(if(saved.readablePages == saved.chapter.pages) tr(R.string.tr_075) else tr(R.string.tr_076),style = MaterialTheme.typography.titleLarge)
+                    Text(if(saved.readablePages == saved.chapter.pages) tr(R.string.tr_077) else tr(R.string.tr_078, saved.readablePages, saved.chapter.pages, localizedStatus(saved.state)))
+                    DisplayButton(onClick = onComplete,enabled = total == saved.chapter.pages && dimensions.all { it.valid },modifier = Modifier.testTag("continuous-finish")) { Text(tr(R.string.tr_079)) }
                 }
             }
         }

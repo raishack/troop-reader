@@ -44,6 +44,9 @@ import kotlinx.coroutines.*
 val Green: Color @Composable get() = MaterialTheme.colorScheme.primary
 val Surface: Color @Composable get() = MaterialTheme.colorScheme.surface
 class MainActivity: ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(AppLanguage.wrap(newBase))
+    }
     lateinit var displayPreferences: DisplayPreferences
     lateinit var einkRefresh: EinkRefresh
     override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
@@ -69,6 +72,7 @@ class MainActivity: ComponentActivity() {
     private val permission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLanguage.initialize(this)
         displayPreferences=DisplayPreferences(this);einkRefresh=EinkRefresh(displayPreferences)
         updateRequested = intent.getBooleanExtra("show_updates", false)
         personalRequested = intent.getBooleanExtra("show_personal", false)
@@ -113,24 +117,25 @@ class MainActivity: ComponentActivity() {
     Scaffold { padding -> Column(Modifier.fillMaxSize().padding(padding).imePadding().verticalScroll(rememberScrollState(), flingBehavior=displayFling()).padding(28.dp), verticalArrangement = Arrangement.Center) {
         Icon(Icons.Outlined.AutoStories, null, Modifier.size(52.dp), tint = Green)
         Spacer(Modifier.height(18.dp))
-        Text("Tu biblioteca.\nTambién sin conexión.", fontSize = 32.sp, lineHeight = 38.sp, fontWeight = FontWeight.Bold)
-        Text("TROOP READER · PARA KAVITA", color = Green, modifier = Modifier.padding(vertical = 18.dp), style = MaterialTheme.typography.labelMedium)
-        OutlinedTextField(server, { server = it }, label = { Text("Servidor Kavita") }, singleLine = true, modifier = Modifier.fillMaxWidth(), enabled = !busy)
+        Text(tr(R.string.tr_164), fontSize = 32.sp, lineHeight = 38.sp, fontWeight = FontWeight.Bold)
+        Text(tr(R.string.tr_165), color = Green, modifier = Modifier.padding(vertical = 18.dp), style = MaterialTheme.typography.labelMedium)
+        OutlinedTextField(server, { server = it }, label = { Text(tr(R.string.tr_166)) }, singleLine = true, modifier = Modifier.fillMaxWidth(), enabled = !busy)
         Spacer(Modifier.height(10.dp))
-        OutlinedTextField(user, { user = it }, label = { Text("Usuario") }, singleLine = true, modifier = Modifier.fillMaxWidth(), enabled = !busy)
+        OutlinedTextField(user, { user = it }, label = { Text(tr(R.string.tr_167)) }, singleLine = true, modifier = Modifier.fillMaxWidth(), enabled = !busy)
         Spacer(Modifier.height(10.dp))
-        OutlinedTextField(password, { password = it }, label = { Text("Contraseña") }, visualTransformation = PasswordVisualTransformation(), singleLine = true, modifier = Modifier.fillMaxWidth(), enabled = !busy)
-        error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(vertical = 10.dp)) }
+        OutlinedTextField(password, { password = it }, label = { Text(tr(R.string.tr_168)) }, visualTransformation = PasswordVisualTransformation(), singleLine = true, modifier = Modifier.fillMaxWidth(), enabled = !busy)
+        error?.let { Text(localizedStatus(it), color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(vertical = 10.dp)) }
         DisplayButton(onClick = { busy = true; error = null; scope.launch {
             try { val a = repo.login(server, user, password); password = ""; Jobs.scheduleSync(repo.context, a.key); DiscoveryJobs.schedule(repo.context,a.key); onLogin(a) }
-            catch (e: Exception) { error = if (e is ApiError || e is IllegalArgumentException) e.message else "No se pudo conectar de forma segura. Comprueba servidor y conexión." }
+            catch (e: Exception) { error = if (e is ApiError || e is IllegalArgumentException) e.message else tr(R.string.tr_169) }
             finally { busy = false }
         } }, enabled = !busy && user.isNotBlank() && password.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(52.dp)) {
-            if (busy) DisplaySpinner(Modifier.size(22.dp)) else Text("Entrar en mi biblioteca")
+            if (busy) DisplaySpinner(Modifier.size(22.dp)) else Text(tr(R.string.tr_170))
         }
-        Text("App independiente · Versión de prueba\nTu contraseña no se guarda. Las descargas quedan en este dispositivo.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 20.dp))
-        if (BuildConfig.DEBUG) DisplayTextButton(onClick = { Demo.install(repo.context); repo.active()?.let(onLogin) }, enabled = !busy) { Text("Ver demostración sin cuenta") }
-        DisplayTextButton(onClick = openUpdates) { Text("Actualizaciones de la app") }
+        Text(tr(R.string.tr_171), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 20.dp))
+        if (BuildConfig.DEBUG) DisplayTextButton(onClick = { Demo.install(repo.context); repo.active()?.let(onLogin) }, enabled = !busy) { Text(tr(R.string.tr_172)) }
+        DisplayTextButton(onClick = openUpdates) { Text(tr(R.string.tr_022)) }
+        LanguageSettings()
         DisplaySettings()
     } }
 }
@@ -174,7 +179,7 @@ class MainActivity: ComponentActivity() {
         selection = emptySet(); volumes = series.cachedVolumes(store.get())
     }
     fun perform(block: suspend () -> Unit) { scope.launch { try { block() } catch (e: CancellationException) { throw e } catch (e: Exception) {
-        snackbar.showSnackbar(if(e is ApiError || e is IllegalStateException || e is IllegalArgumentException) e.message.orEmpty() else "No se pudo conectar. Lo descargado sigue disponible.")
+        snackbar.showSnackbar(if(e is ApiError || e is IllegalStateException || e is IllegalArgumentException) e.message.orEmpty() else tr(R.string.tr_173))
     } } }
     // Re-query the network on resume, then retry stale/failed catalogue requests.
     LaunchedEffect(network.generation, refreshEpoch) { withContext(Dispatchers.Main.immediate) {
@@ -183,7 +188,7 @@ class MainActivity: ComponentActivity() {
             busy = true
             try { repo.refreshLibrary(account.key); if(store.get().followed.isNotEmpty()) DiscoveryJobs.check(repo,account.key) }
             catch(e: CancellationException) { throw e }
-            catch(_: Exception) { snackbar.showSnackbar("No se pudo cargar Kavita. Tus descargas siguen disponibles; puedes reintentar.") }
+            catch(_: Exception) { snackbar.showSnackbar(tr(R.string.tr_174)) }
             finally { busy = false }
         }
     } }
@@ -193,7 +198,7 @@ class MainActivity: ComponentActivity() {
             loadingChapters = true; chapterError = null
             try { volumes = repo.volumes(account.key, series.id) }
             catch(e: CancellationException) { throw e }
-            catch(_: Exception) { chapterError = "No se pudo consultar Kavita. Se muestra el catálogo guardado." }
+            catch(_: Exception) { chapterError = tr(R.string.tr_175) }
             finally { loadingChapters = false }
         }
     } }
@@ -216,17 +221,17 @@ class MainActivity: ComponentActivity() {
     BackHandler(tab != 0 && selectedSeries == null && !settings && !signingOut) { tab = 0 }
     Scaffold(snackbarHost = { SnackbarHost(snackbar) }, topBar = {
         TopAppBar(title = { Column { Text("Troop Reader", fontWeight = FontWeight.Bold); Text("${account.username} · Kavita", style = MaterialTheme.typography.labelMedium, color = Green) } }, actions = {
-            DisplayIconButton(onClick = { refreshEpoch++ }, enabled = !demo) { Icon(Icons.Outlined.Refresh, "Actualizar biblioteca") }
-            DisplayIconButton(onClick = { settings = true }) { Icon(Icons.Outlined.Settings, "Ajustes") }
+            DisplayIconButton(onClick = { refreshEpoch++ }, enabled = !demo) { Icon(Icons.Outlined.Refresh, tr(R.string.tr_178)) }
+            DisplayIconButton(onClick = { settings = true }) { Icon(Icons.Outlined.Settings, tr(R.string.tr_179)) }
             UpdateIcon(repo.context.appUpdates())
         })
     }, bottomBar = {
-        NavigationBar { listOf("Biblioteca" to Icons.Outlined.LocalLibrary, "Descargas" to Icons.Outlined.DownloadForOffline, "Progreso" to Icons.Outlined.Sync, "Mi espacio" to Icons.Outlined.PersonOutline).forEachIndexed { index, (label, icon) ->
+        NavigationBar { listOf(tr(R.string.tr_180) to Icons.Outlined.LocalLibrary, tr(R.string.tr_181) to Icons.Outlined.DownloadForOffline, tr(R.string.tr_182) to Icons.Outlined.Sync, tr(R.string.tr_183) to Icons.Outlined.PersonOutline).forEachIndexed { index, (label, icon) ->
             DisplayNavigationItem(selected = tab == index, onClick = { tab = index }, icon = { BadgedBox(badge = { if(index == 2 && (state.pending.isNotEmpty() || state.bookmarks.any { it.dirty })) Badge { Text((state.pending.size + state.bookmarks.count { it.dirty }).toString()) } }) { Icon(icon, label) } }, label = { Text(label, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) })
         } }
     }) { padding -> Column(Modifier.fillMaxSize().padding(padding)) {
         if (demo || !online) Surface(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.fillMaxWidth()) {
-            Text(if (demo) "Demostración · datos de ejemplo" else "Sin conexión · tus descargas siguen disponibles", style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(18.dp, 8.dp))
+            Text(if (demo) tr(R.string.tr_184) else tr(R.string.tr_185), style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(18.dp, 8.dp))
         }
         if(busy) DisplayProgress(Modifier.fillMaxWidth())
         when(tab) {
@@ -238,11 +243,11 @@ class MainActivity: ComponentActivity() {
                 }.sortedByDescending { it.lastReadAt }
                 LazyVerticalGrid(GridCells.Adaptive(145.dp), contentPadding = PaddingValues(18.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.weight(1f).testTag("library-grid"), flingBehavior=displayFling()) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
-                        OutlinedTextField(query, { query = it }, placeholder = { Text("Buscar en la biblioteca") }, leadingIcon = { Icon(Icons.Outlined.Search, null) }, singleLine = true, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(query, { query = it }, placeholder = { Text(tr(R.string.tr_186)) }, leadingIcon = { Icon(Icons.Outlined.Search, null) }, singleLine = true, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth())
                     }
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         androidx.compose.foundation.lazy.LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), flingBehavior=displayFling()) {
-                            item { DisplayChip(selectedLibrary == 0, { selectedLibrary = 0 }, { Text("Todo") }) }
+                            item { DisplayChip(selectedLibrary == 0, { selectedLibrary = 0 }, { Text(tr(R.string.tr_187)) }) }
                             items(state.libraries.size) { i -> val lib = state.libraries[i]; DisplayChip(selectedLibrary == lib.id, { selectedLibrary = lib.id }, { Text(lib.name) }) }
                         }
                     }
@@ -252,7 +257,7 @@ class MainActivity: ComponentActivity() {
                     if (continuing.isNotEmpty() && query.isBlank() && selectedCategory.isBlank()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             Column {
-                                Text("Continúa donde lo dejaste", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 10.dp))
+                                Text(tr(R.string.tr_188), fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 10.dp))
                                 androidx.compose.foundation.lazy.LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), flingBehavior=displayFling()) {
                                     items(continuing.take(12), key = { it.chapter.id }) { book ->
                                         DisplayCard(onClick = { reader = book.chapter.id }, modifier = Modifier.width(270.dp).testTag("continue-${book.chapter.id}")) {
@@ -263,7 +268,7 @@ class MainActivity: ComponentActivity() {
                                                 }
                                                 Text(book.chapter.labelFor(book.series, state.libraries), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 6.dp))
                                                 DisplayProgress(progress = { book.progressFraction(state.progress[book.chapter.id]) }, modifier = Modifier.fillMaxWidth())
-                                                Text(if(book.ready) "Disponible sin conexión" else "Lectura parcial · ${book.downloadedPages}/${book.chapter.pages}", style = MaterialTheme.typography.labelSmall, color = Green)
+                                                Text(if(book.ready) tr(R.string.tr_189) else tr(R.string.tr_190, book.downloadedPages, book.chapter.pages), style = MaterialTheme.typography.labelSmall, color = Green)
                                             }
                                         }
                                     }
@@ -272,7 +277,7 @@ class MainActivity: ComponentActivity() {
                         }
                     }
                     if(list.isEmpty() && !busy) item(span = { GridItemSpan(maxLineSpan) }) {
-                        EmptyState(if(query.isNotBlank() || selectedLibrary != 0) "Sin resultados" else "Tu biblioteca aparecerá aquí", if(query.isNotBlank() || selectedLibrary != 0) "Prueba otro título o cambia el filtro de biblioteca." else "Conéctate a Kavita y pulsa actualizar. Las descargas no requieren conexión.")
+                        EmptyState(if(query.isNotBlank() || selectedLibrary != 0) tr(R.string.tr_191) else tr(R.string.tr_192), if(query.isNotBlank() || selectedLibrary != 0) tr(R.string.tr_193) else tr(R.string.tr_194))
                     }
                     items(list, key = { it.id }) { s -> Column(Modifier.testTag("library-series-${s.id}").clickable {
                         val start = s.readingStart(state)
@@ -281,7 +286,7 @@ class MainActivity: ComponentActivity() {
                     }) {
                         Box(Modifier.fillMaxWidth().aspectRatio(.68f).clip(RoundedCornerShape(10.dp)).background(Surface), contentAlignment = Alignment.Center) {
                             Cover(repo, account, CoverRef("series",s.id), s.name, Modifier.fillMaxSize(), online, network.generation + refreshEpoch)
-                            if(state.chapters.values.any { it.series.id == s.id && it.ready }) Surface(Modifier.align(Alignment.TopEnd).padding(7.dp), color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(12.dp)) { Icon(Icons.Outlined.OfflinePin, "Descargado", tint = Green, modifier = Modifier.padding(5.dp).size(18.dp)) }
+                            if(state.chapters.values.any { it.series.id == s.id && it.ready }) Surface(Modifier.align(Alignment.TopEnd).padding(7.dp), color = MaterialTheme.colorScheme.secondaryContainer, shape = RoundedCornerShape(12.dp)) { Icon(Icons.Outlined.OfflinePin, tr(R.string.tr_195), tint = Green, modifier = Modifier.padding(5.dp).size(18.dp)) }
                         }
                         val localBooks = state.chapters.values.filter { it.series.id == s.id }
                         val pagesRead = localBooks.sumOf { (state.progress[it.chapter.id]?.pageNum ?: it.chapter.pagesRead).coerceIn(0, it.chapter.pages) }
@@ -290,7 +295,7 @@ class MainActivity: ComponentActivity() {
                         Text(s.name, maxLines = 2, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 8.dp))
                         Text(s.category(state.libraries).label + if(s.format == 4) " · PDF" else "", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         DisplayTextButton(onClick = { showCatalog(s) }, modifier = Modifier.testTag("catalog-series-${s.id}")) {
-                            Column { Text("Ver ${s.unitsName(state.libraries)}"); Text("Descargar más", style = MaterialTheme.typography.labelSmall) }
+                            Column { Text(tr(R.string.tr_197, s.unitsName(state.libraries))); Text(tr(R.string.tr_198), style = MaterialTheme.typography.labelSmall) }
                         }
                     } }
                 }
@@ -298,44 +303,44 @@ class MainActivity: ComponentActivity() {
             1 -> OfflineLibrary(repo, account, state, work, online, network.generation, downloadMore = { showCatalog(it) }) { reader = it }
             3 -> PersonalHub(repo,account,state,personalStart) { showCatalog(it) }
             2 -> {
-                Text("Progreso de lectura", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(18.dp))
-                Text(state.syncMessage, color = Green, modifier = Modifier.padding(horizontal = 18.dp))
-                Text(if(state.settings.preferLocalChanges) "Prioridad: cambios de este móvil" else "Prioridad: revisar conflictos",
+                Text(tr(R.string.tr_199), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(18.dp))
+                Text(localizedStatus(state.syncMessage), color = Green, modifier = Modifier.padding(horizontal = 18.dp))
+                Text(if(state.settings.preferLocalChanges) tr(R.string.tr_200) else tr(R.string.tr_201),
                     style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = 18.dp))
-                if(state.lastSync > 0) Text("Última comprobación: ${java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT).format(java.util.Date(state.lastSync))}", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(18.dp,8.dp))
-                DisplayButton(onClick = { perform { repo.sync(account.key) } }, enabled = !demo, modifier = Modifier.padding(18.dp, 8.dp)) { Icon(Icons.Outlined.Sync, null); Spacer(Modifier.width(8.dp)); Text("Sincronizar ahora") }
-                if(state.pending.isEmpty() && state.syncIssues.isEmpty() && state.bookmarkIssues.isEmpty() && state.bookmarks.none { it.dirty }) EmptyState("Sin cambios pendientes", "Puedes seguir leyendo sin cobertura. Tu avance se guardará aquí hasta reconectar.")
+                if(state.lastSync > 0) Text(tr(R.string.tr_202, java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT, AppLanguage.locale).format(java.util.Date(state.lastSync))), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(18.dp,8.dp))
+                DisplayButton(onClick = { perform { repo.sync(account.key) } }, enabled = !demo, modifier = Modifier.padding(18.dp, 8.dp)) { Icon(Icons.Outlined.Sync, null); Spacer(Modifier.width(8.dp)); Text(tr(R.string.tr_203)) }
+                if(state.pending.isEmpty() && state.syncIssues.isEmpty() && state.bookmarkIssues.isEmpty() && state.bookmarks.none { it.dirty }) EmptyState(tr(R.string.tr_204), tr(R.string.tr_205))
                 LazyColumn(contentPadding = PaddingValues(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp), flingBehavior=displayFling()) {
                     items(state.syncIssues.toList(), key = { "issue-${it.first}" }) { (id, message) -> Card { Column(Modifier.padding(16.dp)) {
-                        Text(state.chapters[id]?.series?.name ?: "Lectura $id", fontWeight = FontWeight.Bold)
-                        Text(message, color = MaterialTheme.colorScheme.error)
-                        Text("Tu copia local y tu progreso se conservan.", style = MaterialTheme.typography.bodySmall)
+                        Text(state.chapters[id]?.series?.name ?: tr(R.string.tr_206, id), fontWeight = FontWeight.Bold)
+                        Text(localizedStatus(message), color = MaterialTheme.colorScheme.error)
+                        Text(tr(R.string.tr_207), style = MaterialTheme.typography.bodySmall)
                     } } }
                     items(state.bookmarkIssues.toList(), key = { "bookmark-issue-${it.first}" }) { (id, message) -> Card { Column(Modifier.padding(16.dp)) {
-                        Text("Marcadores · ${state.chapters[id]?.series?.name ?: id}", fontWeight = FontWeight.Bold)
-                        Text(message, color = MaterialTheme.colorScheme.error)
+                        Text(tr(R.string.tr_208, state.chapters[id]?.series?.name ?: id), fontWeight = FontWeight.Bold)
+                        Text(localizedStatus(message), color = MaterialTheme.colorScheme.error)
                     } } }
                     items(state.bookmarks.filter { it.dirty }, key = { "bookmark-${it.id}" }) { b -> Card { Column(Modifier.padding(16.dp)) {
-                        Text("Marcador · ${b.title}", fontWeight = FontWeight.Bold)
+                        Text(tr(R.string.tr_209, b.title), fontWeight = FontWeight.Bold)
                         Text(state.chapters[b.chapterId]?.series?.name.orEmpty())
-                        Text(if(b.deleted) "Eliminación pendiente" else "Guardado en el móvil · pendiente de sincronizar")
-                        b.error?.takeUnless { b.conflict && state.settings.preferLocalChanges && !b.restored }?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                        Text(if(b.deleted) tr(R.string.tr_210) else tr(R.string.tr_211))
+                        b.error?.takeUnless { b.conflict && state.settings.preferLocalChanges && !b.restored }?.let { Text(localizedStatus(it), color = MaterialTheme.colorScheme.error) }
                         if(b.conflict && (!state.settings.preferLocalChanges || b.restored)) {
-                            Text("La API no informa de la fecha de edición. No elegimos una versión por su hora de descarga.", style = MaterialTheme.typography.bodySmall)
+                            Text(tr(R.string.tr_212), style = MaterialTheme.typography.bodySmall)
                             if(!b.deleted && state.chapters[b.chapterId]?.epub == true) DisplayTextButton(onClick = { perform {
                                 repo.resolveBookmark(account.key,b.id,true); if(!demo) repo.sync(account.key)
-                            } }) { Text("Conservar ambos") }
-                            DisplayTextButton(onClick = { perform { repo.resolveBookmark(account.key,b.id,false); if(!demo) repo.sync(account.key) } }) { Text("Conservar Kavita") }
-                        } else if(b.deleted) DisplayTextButton(onClick = { store.undoBookmarkDelete(b.id); Jobs.sync(repo.context,account.key) }) { Text("Deshacer eliminación") }
+                            } }) { Text(tr(R.string.tr_213)) }
+                            DisplayTextButton(onClick = { perform { repo.resolveBookmark(account.key,b.id,false); if(!demo) repo.sync(account.key) } }) { Text(tr(R.string.tr_214)) }
+                        } else if(b.deleted) DisplayTextButton(onClick = { store.undoBookmarkDelete(b.id); Jobs.sync(repo.context,account.key) }) { Text(tr(R.string.tr_215)) }
                     } } }
                     items(state.pending.toList(), key = { it.first }) { (id, p) -> Card { Column(Modifier.padding(16.dp)) {
-                        Text(state.chapters[id]?.series?.name ?: "Lectura $id", fontWeight = FontWeight.Bold)
-                        Text("En este móvil: ${p.local.pageNum} · ${if(p.conflict != null) "En Kavita: ${p.conflict.pageNum}" else "Pendiente de enviar"}")
-                        p.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                        Text(state.chapters[id]?.series?.name ?: tr(R.string.tr_206, id), fontWeight = FontWeight.Bold)
+                        Text(tr(R.string.tr_218, p.local.pageNum, if(p.conflict != null) tr(R.string.tr_216, p.conflict.pageNum) else tr(R.string.tr_217)))
+                        p.error?.let { Text(localizedStatus(it), color = MaterialTheme.colorScheme.error) }
                         if(p.conflict != null && (!state.settings.preferLocalChanges || p.restored)) {
-                            Text("También cambió en otro dispositivo. Elige qué posición conservar.", modifier = Modifier.padding(top = 8.dp))
-                            DisplayTextButton(onClick = { perform { repo.resolve(account.key, id, true); repo.sync(account.key) } }) { Text("Conservar la del móvil") }
-                            DisplayTextButton(onClick = { perform { repo.resolve(account.key, id, false) } }) { Text("Conservar la de Kavita") }
+                            Text(tr(R.string.tr_219), modifier = Modifier.padding(top = 8.dp))
+                            DisplayTextButton(onClick = { perform { repo.resolve(account.key, id, true); repo.sync(account.key) } }) { Text(tr(R.string.tr_220)) }
+                            DisplayTextButton(onClick = { perform { repo.resolve(account.key, id, false) } }) { Text(tr(R.string.tr_221)) }
                         }
                     } } }
                 }
@@ -357,48 +362,48 @@ class MainActivity: ComponentActivity() {
                     }
                 }
                 SeriesPersonalControls(store,series,state)
-                Text(if(demo || !online) "Catálogo guardado · abre los $noun descargados" else "Elige $noun para leer sin conexión", modifier = Modifier.padding(vertical = 12.dp), color = Green)
+                Text(if(demo || !online) tr(R.string.tr_222, noun) else tr(R.string.tr_223, noun), modifier = Modifier.padding(vertical = 12.dp), color = Green)
                 if(!demo && online && units.isNotEmpty()) {
                     DisplayTextButton(enabled = !queueBusy && !loadingChapters && eligible.isNotEmpty(), onClick = {
                         selection = if(allSelected) emptySet() else eligible
-                    }) { Text(if(allSelected) "Quitar selección" else "Seleccionar todos los $noun") }
-                    DisplayButton(enabled = !queueBusy && !loadingChapters && selection.isNotEmpty(), onClick = { confirmBatch = true }) { Text("Descargar (${selection.size})") }
-                    Text("Los ya descargados no se repiten.", style = MaterialTheme.typography.bodySmall)
+                    }) { Text(if(allSelected) tr(R.string.tr_224) else tr(R.string.tr_225, noun)) }
+                    DisplayButton(enabled = !queueBusy && !loadingChapters && selection.isNotEmpty(), onClick = { confirmBatch = true }) { Text(tr(R.string.tr_226, selection.size)) }
+                    Text(tr(R.string.tr_227), style = MaterialTheme.typography.bodySmall)
                 }
                 if(queueBusy || loadingChapters) DisplayProgress(Modifier.fillMaxWidth())
                 if(batchJob?.isActive == true) DisplayTextButton(onClick = {
-                    batchJob?.cancel(); chapterNotice = "Preparación detenida. Lo añadido sigue en Descargas."
-                }) { Text("Detener preparación del lote") }
+                    batchJob?.cancel(); chapterNotice = tr(R.string.tr_228)
+                }) { Text(tr(R.string.tr_229)) }
                 chapterNotice?.let { Text(it, color = Green, modifier = Modifier.padding(vertical = 8.dp)) }
-                chapterError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                if(!demo && chapterError != null) DisplayTextButton(onClick = { refreshEpoch++ }) { Text("Reintentar conexión") }
+                chapterError?.let { Text(localizedStatus(it), color = MaterialTheme.colorScheme.error) }
+                if(!demo && chapterError != null) DisplayTextButton(onClick = { refreshEpoch++ }) { Text(tr(R.string.tr_230)) }
             }
             items(units, key = { it.key }) { unit ->
                 val ready = unit.ready(state)
                 ListItem(leadingContent = {
                     Cover(repo, account, unit.cover, unit.title, Modifier.size(52.dp,76.dp), online, network.generation + refreshEpoch, CoverRef("series",series.id))
                 }, headlineContent = { Text(unit.title) }, supportingContent = {
-                    Text("${unit.pages} páginas/secciones" + if(unit.chapters.size > 1) " · ${unit.chapters.size} partes" else "")
+                    Text(tr(R.string.tr_231, unit.pages) + if(unit.chapters.size > 1) tr(R.string.tr_232, unit.chapters.size) else "")
                     Text(unit.readingLabel(state), color = Green)
-                    if(ready) Text("Disponible sin conexión", color = Green)
+                    if(ready) Text(tr(R.string.tr_189), color = Green)
                 }, trailingContent = {
                     Column {
-                    if(unit.readable(state)) DisplayTextButton(onClick = { selectedSeries = null; reader = unit.next(state) }) { Text(if(ready) "Leer" else "Leer disponible") }
+                    if(unit.readable(state)) DisplayTextButton(onClick = { selectedSeries = null; reader = unit.next(state) }) { Text(if(ready) tr(R.string.tr_233) else tr(R.string.tr_234)) }
                     if(!ready && !demo && online) DisplayCheckbox(checked = unit.key in selection,
                         onCheckedChange = { checked -> selection = if(checked) selection + unit.key else selection - unit.key },
                         enabled = !queueBusy && unit.key in eligible,
-                        modifier = Modifier.semantics { contentDescription = "Seleccionar ${unit.title}" })
+                        modifier = Modifier.semantics { contentDescription = tr(R.string.tr_235, unit.title) })
                     }
                 })
             }
-            if(units.isEmpty() && !loadingChapters) item { Text("No hay $noun cargados. Si estás offline, abre Descargas.", modifier = Modifier.padding(16.dp)) }
+            if(units.isEmpty() && !loadingChapters) item { Text(tr(R.string.tr_236, noun), modifier = Modifier.padding(16.dp)) }
         }
     }
     if(confirmBatch && selectedSeries != null) DisplayAlertDialog(onDismissRequest = { confirmBatch = false },
-        title = { Text("Descargar selección") },
-        text = { Text("${selection.size} ${selectedSeries!!.unitsName(state.libraries)} · ${selectedParts(units, selection).sumOf { it.pages.toLong() }} páginas/secciones. Se guardarán de uno en uno. " +
-            (if(state.settings.wifiOnly) "Esperarán a una red sin límite de datos. " else "Pueden usar datos móviles. ") +
-            "El tamaño final depende de las imágenes y recursos. Puedes pausar cada descarga.") },
+        title = { Text(tr(R.string.tr_237)) },
+        text = { Text(tr(R.string.tr_238, selection.size, selectedSeries!!.unitsName(state.libraries), selectedParts(units, selection).sumOf { it.pages.toLong() }) +
+            (if(state.settings.wifiOnly) tr(R.string.tr_239) else tr(R.string.tr_240)) +
+            tr(R.string.tr_241)) },
         confirmButton = { DisplayTextButton(onClick = {
             val series = selectedSeries!!; val selectedUnits = units.filter { it.key in selection }; val chosen = selectedParts(units, selection)
             confirmBatch = false; queueBusy = true; chapterError = null
@@ -406,51 +411,52 @@ class MainActivity: ComponentActivity() {
                 try {
                     val result = repo.prepareBatch(account.key,series,chosen) { id -> Jobs.download(repo.context,account.key,id) }
                     val failed = selectedUnits.filter { u -> u.chapters.any { it.id in result.errors } }
-                    chapterNotice = "${selectedUnits.size - failed.size} ${series.unitsName(state.libraries)} preparados · ${result.queued} archivos en cola"
+                    chapterNotice = tr(R.string.tr_242, selectedUnits.size - failed.size, series.unitsName(state.libraries), result.queued)
                     chapterError = result.errors.takeIf { it.isNotEmpty() }?.let { errors ->
-                        "${errors.size} archivos no preparados: " + errors.entries.take(3).joinToString("; ") { (id, msg) -> "${chosen.find { it.id == id }?.label ?: id}: $msg" }
+                        tr(R.string.tr_243, errors.size) + errors.entries.take(3).joinToString("; ") { (id, msg) -> "${chosen.find { it.id == id }?.label ?: id}: $msg" }
                     }
                     selection = failed.map { it.key }.toSet()
                 } catch(e: CancellationException) { throw e }
-                catch(e: Exception) { chapterError = "No se completó el lote. Revisa Descargas antes de reintentar." }
+                catch(e: Exception) { chapterError = tr(R.string.tr_245) }
                 finally { queueBusy = false }
             }
-        }) { Text("Añadir a descargas") } }, dismissButton = { DisplayTextButton(onClick = { confirmBatch = false }) { Text("Cancelar") } })
-    if(settings) DisplayAlertDialog(onDismissRequest = { settings = false }, title = { Text("Ajustes") }, text = { Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
-        Text("${account.server}\nKavita ${account.version.ifBlank { "versión no informada" }}\nTroop Reader ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
-        DisplayTextButton(onClick = { settings = false; openUpdates() }) { Text("Actualizaciones de la app") }
-        Row(verticalAlignment = Alignment.CenterVertically) { Text("Descargar solo por Wi‑Fi", Modifier.weight(1f)); DisplaySwitch(state.settings.wifiOnly, { value -> perform {
+        }) { Text(tr(R.string.tr_246)) } }, dismissButton = { DisplayTextButton(onClick = { confirmBatch = false }) { Text(tr(R.string.tr_161)) } })
+    if(settings) DisplayAlertDialog(onDismissRequest = { settings = false }, title = { Text(tr(R.string.tr_179)) }, text = { Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
+        Text("${account.server}\nKavita ${account.version.ifBlank { tr(R.string.tr_247) }}\nTroop Reader ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
+        DisplayTextButton(onClick = { settings = false; openUpdates() }) { Text(tr(R.string.tr_022)) }
+        Row(verticalAlignment = Alignment.CenterVertically) { Text(tr(R.string.tr_249), Modifier.weight(1f)); DisplaySwitch(state.settings.wifiOnly, { value -> perform {
             policyBusy = true
             try { Jobs.setWifiOnly(repo.context,account.key,value) }
             finally { policyBusy = false }
-        } }, enabled = !policyBusy, modifier = Modifier.semantics { contentDescription = "Solo Wi-Fi" }) }
+        } }, enabled = !policyBusy, modifier = Modifier.semantics { contentDescription = tr(R.string.tr_250) }) }
+        LanguageSettings()
         DisplaySettings()
         SmartDownloadSettings(repo,account,state)
         if(state.coverIssues.isNotEmpty()) {
-            Text("Carátulas: ${state.coverIssues.size} avisos", color = MaterialTheme.colorScheme.error)
+            Text(tr(R.string.tr_251, state.coverIssues.size), color = MaterialTheme.colorScheme.error)
             for(issue in state.coverIssues.values.distinct().take(2)) Text(issue, style = MaterialTheme.typography.bodySmall)
         }
-        Text("Espacio libre en el móvil: ${sizeText(store.root.usableSpace)}", style = MaterialTheme.typography.bodySmall)
-        Text("Solo Wi‑Fi usa redes sin límite de datos. El cambio se aplica también a las descargas pendientes, sin borrar la cola. Las pausadas manualmente seguirán pausadas. El progreso sí se sincroniza por datos. Android puede retrasar el trabajo en segundo plano.", style = MaterialTheme.typography.bodySmall)
+        Text(tr(R.string.tr_252, sizeText(store.root.usableSpace)), style = MaterialTheme.typography.bodySmall)
+        Text(tr(R.string.tr_253), style = MaterialTheme.typography.bodySmall)
         HorizontalDivider(Modifier.padding(vertical = 12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Dar prioridad a este móvil", Modifier.weight(1f))
+            Text(tr(R.string.tr_254), Modifier.weight(1f))
             DisplaySwitch(state.settings.preferLocalChanges, { value ->
                 store.update { it.copy(settings = it.settings.copy(preferLocalChanges = value)) }
-            }, modifier = Modifier.semantics { contentDescription = "Prioridad de este móvil" })
+            }, modifier = Modifier.semantics { contentDescription = tr(R.string.tr_255) })
         }
         Text(if(state.settings.preferLocalChanges)
-            "Los cambios pendientes de lectura y marcadores de esta app sustituyen a los de Kavita, aunque la web haya avanzado más. Sin cambios locales, se reciben los de la web."
-            else "Si cambias una lectura o marcador también en la web, revisa el conflicto antes de sustituirlo.", style = MaterialTheme.typography.bodySmall)
-        Text("Se aplica a las siguientes operaciones de sincronización.", style = MaterialTheme.typography.bodySmall)
-        DisplayTextButton(onClick = { settings = false; signingOut = true }) { Text("Cerrar sesión") }
-    } }, confirmButton = { DisplayTextButton(onClick = { settings = false }) { Text("Listo") } })
-    if(signingOut) DisplayAlertDialog(onDismissRequest = { signingOut = false }, title = { Text("Cerrar sesión") }, text = { Text("Las descargas y ${state.pending.size} avances pendientes se conservarán para esta cuenta. Inicia sesión de nuevo con el mismo usuario para acceder a ellos.") }, confirmButton = { DisplayTextButton(onClick = logout) { Text("Cerrar sesión") } }, dismissButton = { DisplayTextButton(onClick = { signingOut = false }) { Text("Cancelar") } })
+            tr(R.string.tr_256)
+            else tr(R.string.tr_257), style = MaterialTheme.typography.bodySmall)
+        Text(tr(R.string.tr_258), style = MaterialTheme.typography.bodySmall)
+        DisplayTextButton(onClick = { settings = false; signingOut = true }) { Text(tr(R.string.tr_259)) }
+    } }, confirmButton = { DisplayTextButton(onClick = { settings = false }) { Text(tr(R.string.tr_260)) } })
+    if(signingOut) DisplayAlertDialog(onDismissRequest = { signingOut = false }, title = { Text(tr(R.string.tr_259)) }, text = { Text(tr(R.string.tr_261, state.pending.size)) }, confirmButton = { DisplayTextButton(onClick = logout) { Text(tr(R.string.tr_259)) } }, dismissButton = { DisplayTextButton(onClick = { signingOut = false }) { Text(tr(R.string.tr_161)) } })
 }
 @Composable fun EmptyState(title: String, subtitle: String) { Column(Modifier.fillMaxWidth().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) { Icon(Icons.Outlined.AutoStories, null, Modifier.size(48.dp), tint = Green); Spacer(Modifier.height(16.dp)); Text(title, fontWeight = FontWeight.SemiBold); Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 8.dp)) } }
 fun sizeText(bytes: Long): String = when {
-    bytes >= 1_000_000_000 -> "%.1f GB".format(bytes / 1e9)
-    bytes >= 1_000_000 -> "%.1f MB".format(bytes / 1e6)
-    bytes >= 1000 -> "%.0f KB".format(bytes / 1000.0)
+    bytes >= 1_000_000_000 -> "%.1f GB".format(AppLanguage.locale, bytes / 1e9)
+    bytes >= 1_000_000 -> "%.1f MB".format(AppLanguage.locale, bytes / 1e6)
+    bytes >= 1000 -> "%.0f KB".format(AppLanguage.locale, bytes / 1000.0)
     else -> "${bytes.coerceAtLeast(0)} B"
 }

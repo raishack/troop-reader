@@ -10,21 +10,21 @@ import java.io.OutputStream
 object Backups {
     const val MAX_BYTES = 16 * 1024 * 1024
     fun portable(s: LocalState) = s.copy(chapters = s.chapters.mapValues { (_,c) -> c.copy(ready=false,
-        downloadedPages=0,totalBytes=0,downloadRequested=false,downloadRequestId="removed",automatic=false,state="Eliminado del dispositivo") },
+        downloadedPages=0,totalBytes=0,downloadRequested=false,downloadRequestId="removed",automatic=false,state=tr(R.string.tr_269)) },
         serverShelves=ServerShelves(),coverIssues=emptyMap(),coverRevision=0,syncIssues=emptyMap(),bookmarkIssues=emptyMap(),lastSync=0,
-        syncMessage="Datos restaurados; revisa Progreso antes de sincronizar",smartMessage="",
+        syncMessage=tr(R.string.tr_523),smartMessage="",
         smartDownloads=s.smartDownloads.copy(enabled=false))
     fun write(account: Account, state: LocalState, output: OutputStream) {
         val bytes = codec.encodeToString(ReadingBackup(accountKey=account.key,state=portable(state))).toByteArray()
-        require(bytes.size <= MAX_BYTES) { "La copia supera el tamaño máximo de 16 MB" }
+        require(bytes.size <= MAX_BYTES) { tr(R.string.tr_524) }
         output.write(bytes); output.flush()
     }
     fun read(account: Account, input: InputStream): ReadingBackup {
         val out=java.io.ByteArrayOutputStream(); val buffer=ByteArray(16384)
-        while(true) { val n=input.read(buffer);if(n<0)break;require(out.size()+n<=MAX_BYTES) { "La copia supera 16 MB" };out.write(buffer,0,n) }
+        while(true) { val n=input.read(buffer);if(n<0)break;require(out.size()+n<=MAX_BYTES) { tr(R.string.tr_525) };out.write(buffer,0,n) }
         val backup=codec.decodeFromString<ReadingBackup>(out.toString("UTF-8"))
-        require(backup.schema==1) { "Formato de copia no compatible" }
-        require(backup.accountKey==account.key) { "Esta copia pertenece a otro servidor o usuario. Inicia sesión en la cuenta original." }
+        require(backup.schema==1) { tr(R.string.tr_526) }
+        require(backup.accountKey==account.key) { tr(R.string.tr_527) }
         validate(backup.state)
         return backup.copy(state=portable(backup.state))
     }

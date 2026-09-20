@@ -43,13 +43,13 @@ suspend fun Repository.ensureCover(key: String, ref: CoverRef, force: Boolean = 
         val fresh = File(file.parentFile, file.name + ".fresh")
         try {
             coverSlots.withPermit { runInterruptible { api(key).download(ref.path, fresh, extendedTimeout = false) } }
-            check(validCover(fresh)) { "Kavita no devolvió una carátula válida" }
-            check(fresh.renameTo(file)) { "No se pudo guardar la carátula" }
+            check(validCover(fresh)) { tr(R.string.tr_080) }
+            check(fresh.renameTo(file)) { tr(R.string.tr_081) }
             store.update { it.copy(coverRevision = it.coverRevision + 1, coverIssues = it.coverIssues - "${ref.kind}:${ref.id}") }
             true
         } catch(e: CancellationException) { throw e }
         catch (e: Exception) {
-            val message = if(e is ApiError) e.message.orEmpty() else "No se pudo cargar la carátula. Comprueba la conexión."
+            val message = if(e is ApiError) e.message.orEmpty() else tr(R.string.tr_082)
             store.update { it.copy(coverIssues = it.coverIssues + ("${ref.kind}:${ref.id}" to message)) }
             false // Keep the last good cover. Retry on next foreground/refresh.
         }
@@ -69,8 +69,8 @@ suspend fun Repository.ensureCover(key: String, ref: CoverRef, force: Boolean = 
     val file = remember(ref, state.coverRevision) { ref.file(store).takeIf { it.exists() } ?: fallback?.file(store) }
     val stamp = remember(file, state.coverRevision) { file?.lastModified() }
     Box(modifier.background(Surface), contentAlignment = Alignment.Center) {
-        Icon(Icons.Outlined.MenuBook, "Sin carátula · $title", Modifier.size(30.dp), tint = Green)
+        Icon(Icons.Outlined.MenuBook, tr(R.string.tr_083, title), Modifier.size(30.dp), tint = Green)
         if(file != null) DisplayImage(ImageRequest.Builder(LocalContext.current).data(file)
-            .memoryCacheKey("${file.path}:$stamp").build(), "Carátula · $title", Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
+            .memoryCacheKey("${file.path}:$stamp").build(), tr(R.string.tr_084, title), Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
     }
 }

@@ -1,32 +1,32 @@
-# Implementación con Kavita
+# Setting up Kavita
 
-## Instalación normal
+## Normal installation
 
-1. Instala una versión oficial de [Kavita](https://github.com/Kareadita/Kavita/releases) y crea bibliotecas con libros que puedas utilizar.
-2. Publica mediante HTTPS con certificado válido. El proxy debe conservar cabeceras de autenticación, rutas y respuestas binarias. No desactives la validación TLS.
-3. Crea un usuario normal con acceso a las bibliotecas y permiso **Download**. No hace falta dar permisos de administrador a Troop Reader.
-4. Inicia sesión en la app con la URL HTTPS. Comprueba portada, una descarga manga y un EPUB con imágenes/fuentes, lectura offline y sincronización usando datos de prueba.
+1. Install an official [Kavita release](https://github.com/Kareadita/Kavita/releases) and create libraries using content you are entitled to use.
+2. Expose it over HTTPS with a valid certificate. The reverse proxy must preserve authentication headers, paths and binary responses. Do not disable TLS verification.
+3. Create a regular user with library access and **Download** permission. Troop Reader does not need administrator privileges.
+4. Sign in using the HTTPS URL. Test covers, a manga download, an EPUB with images/fonts, offline reading and sync using test data.
 
-La app usa sesión por cabecera y renovación de sesión; no requiere introducir API keys ni publicarlas en URLs. No incluye un servidor Kavita ni un conector Yamtrack.
+The app uses header-based sessions and session renewal. You do not need to enter API keys or place them in URLs. A Kavita server and Yamtrack connector are not bundled.
 
-## Compatibilidad comprobada
+## Verified compatibility
 
-| Servidor | Situación |
+| Server | Findings |
 |---|---|
-| 0.9.0.2 | La instalación ensayada necesitó hacer opcionales los parámetros `apiKey` de cinco rutas de imágenes. Herramienta histórica en `server-compat/0.9.0.2`. |
-| 0.9.1.4 | Carátulas corregidas upstream. La instalación ensayada todavía necesitó el ajuste de `ReaderController.GetImage(apiKey)`, solo un parámetro. |
-| Otras versiones | No certificadas: ejecutar pruebas antes de actualizar o modificar. No reaplicar una DLL antigua. |
+| 0.9.0.2 | The tested installation required making `apiKey` optional on five image routes. Historical tool in `server-compat/0.9.0.2`. |
+| 0.9.1.4 | Cover routes are fixed upstream. The tested installation still required the adjustment to `ReaderController.GetImage(apiKey)`, one parameter only. |
+| Other versions | Not certified: test before upgrading or modifying. Never reuse an older patched DLL. |
 
-Si una petición autenticada a `api/Reader/image` da 400 indicando `apiKey` requerido, consulta [server-compat](../server-compat/README.md). **No es un parche obligatorio para todo Kavita:** confirma primero versión, respuesta y causa. Un 401/403, falta de permisos o archivo ausente es otro problema.
+If an authenticated request to `api/Reader/image` returns HTTP 400 stating that `apiKey` is required, see [server-compat](../server-compat/README.md). **This is not a mandatory patch for every Kavita installation:** first confirm the version, response and cause. HTTP 401/403, missing permissions or missing files are different problems.
 
-El ajuste modifica metadatos de nulabilidad del parámetro, no elimina autenticación ni cambia las instrucciones del controlador. Se ensaya en copia; las peticiones anónimas deben seguir denegadas. No uses `apiKey` de relleno ni desactives autorización global.
+The adjustment changes parameter nullability metadata; it does not remove authentication or change controller instructions. Test it in an isolated copy: anonymous requests must remain denied. Do not use a dummy `apiKey` or globally disable authorization.
 
-## EPUB y conflictos
+## EPUB and conflicts
 
-Desde alpha18 el cliente resuelve ciertas rutas alternativas de fuentes EPUB dentro del mismo libro. Si una descarga falla, conserva su cola y usa Reintentar; el detalle técnico se muestra en la ficha. No borrar progreso para solucionar un 400.
+Since alpha18 the client resolves certain alternative EPUB font paths within the same book. If a download fails, keep its queue entry and select Retry; the item details show the error. Do not erase reading progress to fix HTTP 400.
 
-Conflictos manuales por defecto. «Dar prioridad a este móvil» solo envía cambios locales pendientes. Las restauraciones requieren comparación con el servidor, no aplicar una copia antigua ciegamente.
+Conflicts are manual by default. **Give this device priority** only sends pending local changes. Restored backups must be compared with the server, never blindly applied over newer data.
 
 ## Yamtrack
 
-Es independiente de la app. La instalación validada usa un conector externo con una lista explícita `allowed_kavita_versions`. Ese campo pertenece al conector, **no** es un ajuste estándar que deba añadirse a cualquier Yamtrack. Ver [procedimiento de actualización](KAVITA-UPGRADE.md).
+The integration is independent of the app. The tested installation uses [kavita-yamtrack-sync](https://github.com/raishack/kavita-yamtrack-sync) with an explicit `allowed_kavita_versions` list. This is a connector setting, **not** a standard setting to add to any Yamtrack installation. See [controlled upgrades](KAVITA-UPGRADE.md).

@@ -6,8 +6,8 @@ import java.util.Locale
 fun String.searchKey(): String = Normalizer.normalize(trim(), Normalizer.Form.NFD)
     .replace(Regex("\\p{M}+"), "").lowercase(Locale.ROOT)
 
-enum class OfflineSort(val label: String) { RECENT("Lectura reciente"), TITLE("Título A–Z"), SIZE("Mayor tamaño") }
-enum class OfflineFilter(val label: String) { ALL("Todas"), READING("En lectura"), UNREAD("Pendientes"), READ("Descargas leídas") }
+enum class OfflineSort(private val labelId: Int) { RECENT((R.string.tr_278)), TITLE((R.string.tr_279)), SIZE((R.string.tr_280)); val label get() = tr(labelId) }
+enum class OfflineFilter(private val labelId: Int) { ALL((R.string.tr_281)), READING((R.string.tr_282)), UNREAD((R.string.tr_283)), READ((R.string.tr_284)); val label get() = tr(labelId) }
 data class OfflineWork(val series: Series, val downloads: List<SavedChapter>, val bytes: Long,
     val lastRead: Long, val started: Boolean, val read: Boolean)
 

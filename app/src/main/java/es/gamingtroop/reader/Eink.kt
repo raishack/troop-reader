@@ -12,8 +12,9 @@ import android.view.ViewTreeObserver
 import androidx.compose.runtime.*
 
 /** Device preference, deliberately outside account/backup and per-book settings. */
-enum class DisplayMode(val label: String) {
-    NORMAL("Pantalla normal"), MONO("Tinta electrónica B/N"), COLOR("Tinta electrónica color");
+enum class DisplayMode(private val labelId: Int) {
+    NORMAL((R.string.tr_116)), MONO((R.string.tr_117)), COLOR((R.string.tr_118));
+    val label get() = tr(labelId)
     val eink get() = this != NORMAL
 }
 class DisplayPreferences(context: Context, private val firmware: String = "${Build.VERSION.SDK_INT}:${Build.DISPLAY}") {

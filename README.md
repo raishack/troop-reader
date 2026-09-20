@@ -1,55 +1,57 @@
 # Troop Reader
 
-Cliente Android independiente para **Kavita**, centrado en lectura offline de EPUB, manga, cómic y PDF. Interfaz en español; Kotlin y Jetpack Compose. **Versión alpha: 0.1.0-alpha21**, Android 8.0+ (API 26). GPL-3.0. No es una aplicación oficial de Kavita.
+An independent **Kavita** client for Android, built for offline EPUB, manga, comics and PDF reading. **Spanish and English interface**, Kotlin and Jetpack Compose. Android 8.0+ (API 26), GPL-3.0. This is an alpha application, not an official Kavita app.
 
-## Instalar y conectar
+## Install and connect
 
-1. Descarga la APK de [Releases](https://github.com/raishack/troop-reader/releases) o del [canal del mantenedor](https://claw.raishack.es/troop-reader/).
-2. Instálala encima de una versión anterior **sin desinstalar ni borrar datos**. Android solicita confirmar la instalación.
-3. Introduce la URL HTTPS de **tu** Kavita y una cuenta con acceso a las bibliotecas y permiso de descarga. El formulario propone el servidor del proyecto; cámbialo por el tuyo. No incluye acceso ni cuentas compartidas.
-4. Descarga una obra o usa «Ver demostración sin cuenta». Comprueba lectura offline, reanudación y sincronización.
-5. Lee la [guía de Kavita](docs/KAVITA.md): ciertas versiones requieren un ajuste de servidor para servir imágenes con autenticación por cabecera.
+1. Download the APK from [Releases](https://github.com/raishack/troop-reader/releases) or the [maintainer's update channel](https://claw.raishack.es/troop-reader/).
+2. Install over the previous version **without uninstalling or clearing app data**. Android asks you to confirm installation.
+3. Select **Español / English** on the sign-in screen or under **Settings → App language**. Existing installations start in Spanish. This changes the interface, not your books, annotations or reading voice.
+4. Enter **your** Kavita HTTPS URL and an account with library access and the **Download** permission. The form initially suggests the project's server; replace it with yours. No shared accounts or server access are included.
+5. Download a book/volume or select **Try the demo without an account**. Check offline reading, resume and synchronization.
+6. Read the [Kavita setup guide](docs/KAVITA.md): some versions need a server compatibility adjustment for header-authenticated images.
 
-Las futuras versiones del canal original se detectan en Ajustes → Actualizaciones. La APK sigue requiriendo confirmación de Android; no se instala silenciosamente.
+Future versions from the original channel are detected under **Settings → App updates**. Android still requires confirmation; updates are never installed silently.
 
-## Funciones
+## Features
 
-- Biblioteca por obra y tomos, carátulas offline, descarga por selección y cola con pausa/reanudación.
-- Lectura mientras descarga, sin saltar sobre contenido todavía ausente.
-- Bordes por defecto, arrastre opcional, pinza y doble toque central; zoom conservado, RTL, doble página y efecto Hoja opcional.
-- Vertical continuo, selector de tomos/páginas, miniaturas, índice EPUB y salto directo.
-- Progreso y marcadores con sincronización y conflictos manuales por defecto; prioridad local opcional.
-- Favoritos, colecciones personales, seguimiento de novedades, descarga anticipada optativa y ajustes por obra.
-- EPUB: búsqueda local, subrayados/notas exportables, diccionario mediante app compatible y voz offline en segundo plano.
-- Botones de volumen opcionales, orientación, estadísticas, copia/restauración y diagnóstico exportable.
-- Listas/colecciones de Kavita de consulta con caché. No edición remota.
-- [Tinta electrónica B/N y color](docs/EINK.md); integración [Bigme experimental](docs/BIGME-B751C-S.md).
+- Online/offline libraries grouped by series, cached covers, batch downloads and a pause/resume queue.
+- Read while downloading, without skipping missing content.
+- Instant edge taps by default, optional swipes, pinch and central double-tap zoom; retained zoom, RTL, two-page spreads and optional page curl.
+- Continuous vertical reading, volume/page selection, thumbnails, EPUB contents and direct page/section navigation.
+- Progress and bookmark sync with manual conflict resolution by default; optional device priority.
+- Favourites, personal collections, followed series, optional next-volume downloads and per-series reading preferences.
+- EPUB: local search, exportable highlights/notes, dictionary through a compatible app and background offline text-to-speech.
+- Optional volume-button navigation, orientation lock, statistics, reading backups and diagnostic exports.
+- Read-only Kavita lists/collections with offline caching.
+- [Monochrome and colour e-ink modes](docs/EINK.md), including [experimental Bigme refresh](docs/BIGME-B751C-S.md).
 
-## Documentación
+## Documentation
 
-- [Compilar y ejecutar pruebas](docs/BUILD.md)
-- [Configurar Kavita y resolver incompatibilidades](docs/KAVITA.md)
-- [Actualizar Kavita con ensayo, Yamtrack y reversión](docs/KAVITA-UPGRADE.md)
-- [Arquitectura, datos y contratos](docs/ARCHITECTURE.md)
-- [Publicar actualizaciones / forks y firmas](docs/RELEASING.md)
-- [Protocolo del actualizador](docs/APP-UPDATES.md)
-- [Validación y limitaciones](docs/VALIDATION.md)
-- [Contribuir](CONTRIBUTING.md) · [Seguridad](SECURITY.md) · [Licencias](NOTICE.md)
+- [Build and test](docs/BUILD.md)
+- [Kavita setup and compatibility](docs/KAVITA.md)
+- [Controlled Kavita upgrades, Yamtrack and rollback](docs/KAVITA-UPGRADE.md)
+- [Architecture and data contracts](docs/ARCHITECTURE.md)
+- [Languages and translation maintenance](docs/LOCALIZATION.md)
+- [Releases, signing and forks](docs/RELEASING.md)
+- [In-app update protocol](docs/APP-UPDATES.md)
+- [Validation and limitations](docs/VALIDATION.md)
+- [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Licensing](NOTICE.md)
 
-## Límites importantes
+## Important limitations
 
-Kavita no ofrece escritura condicional para todos los datos de lectura: la detección de conflictos reduce, pero no elimina, las carreras entre clientes. Borrar descargas conserva progreso y marcadores. Las copias de lectura **no incluyen libros ni contraseñas**.
+Kavita does not provide conditional writes for all reading data. Conflict detection reduces, but cannot eliminate, races between clients. Deleting downloaded files preserves progress and bookmarks. Reading backups **do not contain books or passwords**.
 
-La voz depende de un motor/voz instalado. El diccionario requiere una app compatible con Procesar texto. No hay OCR, búsqueda de texto en manga/PDF, edición de listas remotas ni soporte completo SSO/2FA.
+Speech needs an installed offline engine/voice. Dictionary lookup needs an app supporting Android's Process text action. There is no OCR, manga/PDF text search, remote list editing or complete SSO/2FA support.
 
-Un emulador no valida el ghosting de un panel e-ink. El refresco Bigme es opt-in y aún no está confirmado físicamente en B751C S / Android 14 / firmware 1.7.0. El repintado negro/blanco no garantiza un refresco físico.
+An emulator cannot validate ghosting on a physical e-ink panel. Bigme refresh is opt-in and remains physically unverified on B751C S / Android 14 / firmware 1.7.0. A black/white redraw does not guarantee a full panel refresh.
 
-## Desarrollo rápido
+## Quick development setup
 
-JDK 17, Android SDK 35 y Build Tools 35.0.0. Configura `ANDROID_HOME` o `local.properties` (no versionarlo).
+JDK 17, Android SDK 35 and Build Tools 35.0.0. Configure `ANDROID_HOME` or an untracked `local.properties`.
 
 ```sh
 ./gradlew testDebugUnitTest lintDebug assembleDebug
 ```
 
-No uses dispositivos con lecturas reales para los tests instrumentados. Consulta [BUILD](docs/BUILD.md) antes de ejecutarlos.
+Never run instrumented tests on a device containing real reading data. See [BUILD](docs/BUILD.md) first. CI artifacts use a development signature and cannot necessarily update a maintainer-signed installation.

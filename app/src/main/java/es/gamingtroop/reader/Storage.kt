@@ -81,7 +81,7 @@ class Store(val root: File) {
         update { s ->
             val chapter = s.chapters[id]?.chapter ?: return@update s
             require(page in 0 until chapter.pages)
-            val label = title.trim().take(100).ifBlank { "Página ${page + 1}" }
+            val label = title.trim().take(100).ifBlank { tr(R.string.tr_062, page + 1) }
             val existing = s.bookmarks.find { !it.deleted && it.chapterId == id && it.page == page &&
                 it.scroll.orEmpty() == scroll.orEmpty() && it.edition.sameEdition(chapter) }
             if (existing != null) return@update s // Saving a position twice is not an edit of the remote marker.
@@ -135,7 +135,7 @@ class Store(val root: File) {
     }
     // Progress and queued writes are deliberately independent of the downloaded payload.
     fun deletePayload(id: Int) {
-        check(chapterDir(id).let { !it.exists() || it.deleteRecursively() }) { "No se pudo eliminar la descarga" }
-        update { s -> s.copy(chapters = s.chapters.mapValues { (key, value) -> if (key == id) value.copy(ready = false, downloadRequested = false, downloadRequestId = "removed", downloadedPages = 0, totalBytes = 0, state = "Eliminado del dispositivo") else value }) }
+        check(chapterDir(id).let { !it.exists() || it.deleteRecursively() }) { tr(R.string.tr_559) }
+        update { s -> s.copy(chapters = s.chapters.mapValues { (key, value) -> if (key == id) value.copy(ready = false, downloadRequested = false, downloadRequestId = "removed", downloadedPages = 0, totalBytes = 0, state = canonicalText(R.string.tr_269)) else value }) }
     }
 }

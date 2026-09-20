@@ -37,20 +37,20 @@ class OfflineHtml(private val server: String, private val chapterId: Int, privat
         val relative = stylesheet != null && !raw.startsWith('/') && !Regex("^[a-z][a-z0-9+.-]*:", RegexOption.IGNORE_CASE).containsMatchIn(raw)
         val resolved = if (relative) {
             val packageBase = "https://epub.invalid/".toHttpUrl().newBuilder().addPathSegments(stylesheet!!).build()
-            val resource = packageBase.resolve(raw) ?: error("Recurso EPUB no válido")
-            require(resource.host == "epub.invalid" && resource.query == null) { "Ruta de recurso EPUB no compatible" }
+            val resource = packageBase.resolve(raw) ?: error(tr(R.string.tr_271))
+            require(resource.host == "epub.invalid" && resource.query == null) { tr(R.string.tr_272) }
             base.newBuilder().encodedPath(base.encodedPath.trimEnd('/') + "/api/Book/$chapterId/book-resources")
                 .query(null).addQueryParameter("file", resource.pathSegments.joinToString("/"))
                 .fragment(resource.fragment).build()
-        } else base.resolve(raw) ?: error("Recurso EPUB no válido")
+        } else base.resolve(raw) ?: error(tr(R.string.tr_271))
         val expected = base.encodedPath.trimEnd('/') + "/api/Book/$chapterId/book-resources"
-        require(resolved.scheme == base.scheme && resolved.host == base.host && resolved.port == base.port && resolved.encodedPath.equals(expected, true)) { "El libro contiene recursos externos no descargables de forma segura" }
-        val file = resolved.queryParameter("file") ?: error("Falta la ruta del recurso")
+        require(resolved.scheme == base.scheme && resolved.host == base.host && resolved.port == base.port && resolved.encodedPath.equals(expected, true)) { tr(R.string.tr_273) }
+        val file = resolved.queryParameter("file") ?: error(tr(R.string.tr_274))
         val request = "api/Book/$chapterId/book-resources?file=" + java.net.URLEncoder.encode(file, "UTF-8")
         // Never persist Kavita's embedded apiKey, and never forward it to another origin.
         val fragment = resolved.encodedFragment?.let { "#$it" }.orEmpty()
         visited[request]?.let { return it + fragment }
-        require(visited.size < 5000 && depth < 12) { "Demasiados recursos enlazados en el EPUB" }
+        require(visited.size < 5000 && depth < 12) { tr(R.string.tr_275) }
         val css = file.substringBefore('?').endsWith(".css", true)
         val suffix = if (css) ".css" else when (file.substringAfterLast('.').lowercase()) {
             "woff", "woff2", "ttf", "otf", "jpg", "jpeg", "png", "gif", "webp", "svg" -> "." + file.substringAfterLast('.').lowercase()
@@ -80,7 +80,7 @@ class OfflineHtml(private val server: String, private val chapterId: Int, privat
                 try { staging.writeText(rewriteCss(staging.readText(), fetchedPath)) }
                 finally { depth-- }
             }
-            check(staging.renameTo(target)) { "No se pudo guardar el recurso del libro" }
+            check(staging.renameTo(target)) { tr(R.string.tr_276) }
         } catch (e: Exception) {
             visited.remove(request)
             throw e

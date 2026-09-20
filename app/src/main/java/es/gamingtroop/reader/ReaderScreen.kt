@@ -189,7 +189,7 @@ private const val LOCAL = "https://reader.local/"
         val observed = page; val view = web
         fun draft(path: String?) {
             if (!alive.get() || latestPage != observed) return
-            draftPage = observed; draftScroll = path; draftTitle = "Página ${observed + 1}"
+            draftPage = observed; draftScroll = path; draftTitle = tr(R.string.tr_062, observed + 1)
         }
         if (saved.epub && ready && view != null) view.evaluateJavascript("window.troopPosition()") { result ->
             if (web === view && latestReady) draft(runCatching { codec.parseToJsonElement(result).jsonPrimitive.contentOrNull }.getOrNull())
@@ -259,27 +259,27 @@ private const val LOCAL = "https://reader.local/"
     val pageFile = File(store.chapterDir(id), if(saved.epub) "$page.html" else "$page.img")
     if (!pageFile.isFile || pageFile.length() == 0L) {
         Scaffold { padding -> Column(Modifier.fillMaxSize().padding(padding).padding(24.dp)) {
-            Text(if(saved.ready) "No se encuentra esta página" else "Esta sección aún no está descargada", style = MaterialTheme.typography.headlineSmall)
-            Text(if(saved.ready) "Tu progreso sigue guardado. Reintenta la descarga desde Biblioteca." else "${saved.readablePages}/${total} disponibles · ${saved.state}. Conservamos tu posición mientras continúa la descarga.")
-            if(!saved.ready) DisplayTextButton(onClick = { if(saved.readablePages>0) { page = minOf(page,saved.readablePages-1);scrollTarget = "" } }) { Text("Leer lo disponible") }
-            DisplayButton(onClick = close) { Text("Volver a Descargas") }
+            Text(if(saved.ready) tr(R.string.tr_430) else tr(R.string.tr_431), style = MaterialTheme.typography.headlineSmall)
+            Text(if(saved.ready) tr(R.string.tr_432) else tr(R.string.tr_433, saved.readablePages, total, localizedStatus(saved.state)))
+            if(!saved.ready) DisplayTextButton(onClick = { if(saved.readablePages>0) { page = minOf(page,saved.readablePages-1);scrollTarget = "" } }) { Text(tr(R.string.tr_434)) }
+            DisplayButton(onClick = close) { Text(tr(R.string.tr_435)) }
         } }
         return
     }
     var sliderPage by remember(page) { mutableFloatStateOf(page.toFloat()) }
     Box(Modifier.fillMaxSize().testTag("reader-surface")) {
         // Content never resizes when controls appear: avoids jumping to another EPUB paragraph.
-        val overlay: @Composable () -> Unit = { TopAppBar(title = { Column(Modifier.clickable { navigate("units") }.testTag("reader-current-unit")) { if(!compactHeader) Text(saved.series.name, maxLines = 1); Row(verticalAlignment = Alignment.CenterVertically) { Text(saved.chapter.labelFor(saved.series,state.libraries),style = if(compactHeader) MaterialTheme.typography.titleMedium else MaterialTheme.typography.labelMedium,maxLines = 1,modifier = Modifier.weight(1f,false)); Icon(Icons.Outlined.ArrowDropDown,null) } } }, navigationIcon = { DisplayIconButton(onClick = { leave() }) { Icon(Icons.Outlined.ArrowBack, "Volver") } }, actions = {
+        val overlay: @Composable () -> Unit = { TopAppBar(title = { Column(Modifier.clickable { navigate("units") }.testTag("reader-current-unit")) { if(!compactHeader) Text(saved.series.name, maxLines = 1); Row(verticalAlignment = Alignment.CenterVertically) { Text(saved.chapter.labelFor(saved.series,state.libraries),style = if(compactHeader) MaterialTheme.typography.titleMedium else MaterialTheme.typography.labelMedium,maxLines = 1,modifier = Modifier.weight(1f,false)); Icon(Icons.Outlined.ArrowDropDown,null) } } }, navigationIcon = { DisplayIconButton(onClick = { leave() }) { Icon(Icons.Outlined.ArrowBack, tr(R.string.tr_436)) } }, actions = {
         if(saved.epub) Box {
-            DisplayIconButton(onClick={ showTools=true }) { Icon(Icons.Outlined.MoreVert,"Herramientas del libro") }
+            DisplayIconButton(onClick={ showTools=true }) { Icon(Icons.Outlined.MoreVert,tr(R.string.tr_162)) }
             DisplayDropdownMenu(expanded=showTools,onDismissRequest={ showTools=false }) {
-                listOf("search" to "Buscar en el libro", "add" to "Subrayar / Nota", "notes" to "Subrayados y notas", "voice" to "Lectura en voz alta", "dictionary" to "Diccionario").forEach { (mode,label) ->
+                listOf("search" to tr(R.string.tr_437), "add" to tr(R.string.tr_403), "notes" to tr(R.string.tr_138), "voice" to tr(R.string.tr_145), "dictionary" to tr(R.string.tr_126)).forEach { (mode,label) ->
                     DropdownMenuItem(text={ Text(label) },onClick={ showTools=false;toolMode=mode })
                 }
             }
         }
-        DisplayIconButton(onClick = { showBookmarks = true }) { Icon(Icons.Outlined.Bookmarks, "Marcadores") }
-        DisplayIconButton(onClick = { navigate(if(saved.epub) "pages" else "units") }) { Icon(Icons.Outlined.FormatListBulleted, if(saved.epub) "Índice" else "Tomos y páginas") }
+        DisplayIconButton(onClick = { showBookmarks = true }) { Icon(Icons.Outlined.Bookmarks, tr(R.string.tr_438)) }
+        DisplayIconButton(onClick = { navigate(if(saved.epub) "pages" else "units") }) { Icon(Icons.Outlined.FormatListBulleted, if(saved.epub) "Índice" else tr(R.string.tr_439)) }
         DisplayIconButton(onClick = {
             val view = web; val observed = page
             if (saved.epub && ready && view != null) view.evaluateJavascript("window.troopPosition()") { result ->
@@ -289,16 +289,16 @@ private const val LOCAL = "https://reader.local/"
                     showSettings = true
                 }
             } else showSettings = true
-        }) { Icon(Icons.Outlined.Tune, "Opciones de lectura") }
+        }) { Icon(Icons.Outlined.Tune, tr(R.string.tr_440)) }
     }) }
         val footer: @Composable () -> Unit = { Surface { Column(Modifier.navigationBarsPadding().padding(horizontal = 12.dp)) {
-        if(!saved.ready) Text("${saved.readablePages}/$total descargadas · puedes seguir leyendo lo disponible",style = MaterialTheme.typography.labelSmall)
+        if(!saved.ready) Text(tr(R.string.tr_441, saved.readablePages, total),style = MaterialTheme.typography.labelSmall)
         Slider(value = sliderPage, onValueChange = { sliderPage = it }, onValueChangeFinished = { changePage(sliderPage.toInt()); controlEpoch++ }, valueRange = 0f..(total - 1).coerceAtLeast(1).toFloat(), enabled = total > 1)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            DisplayTextButton(onClick = { previousPage() }, enabled = (page > 0 || displayMode.eink && saved.epub) && ready && turnFrame == null) { Text(if(settings.rtl && !saved.epub) "Anterior →" else "← Anterior") }
+            DisplayTextButton(onClick = { previousPage() }, enabled = (page > 0 || displayMode.eink && saved.epub) && ready && turnFrame == null) { Text(if(settings.rtl && !saved.epub) tr(R.string.tr_442) else tr(R.string.tr_443)) }
             DisplayTextButton(onClick = { navigate("pages") },modifier = Modifier.testTag("reader-page-selector")) { Text(if(step == 2 && page + 1 < total) "${page + 1}–${page + 2} / $total" else "${page + 1} / $total", color = Green) }
-            if(page + step < total) DisplayTextButton(enabled = ready, onClick = { nextPage() }) { Text(if(settings.rtl && !saved.epub) "← Siguiente" else "Siguiente →") }
-            else DisplayTextButton(enabled = ready,onClick = { complete() }) { Text("Terminado") }
+            if(page + step < total) DisplayTextButton(enabled = ready, onClick = { nextPage() }) { Text(if(settings.rtl && !saved.epub) tr(R.string.tr_446) else tr(R.string.tr_447)) }
+            else DisplayTextButton(enabled = ready,onClick = { complete() }) { Text(tr(R.string.tr_448)) }
         }
     } } }
         val keyValue = "${id}-${if(saved.epub) page else "images"}-${settings.copy(wifiOnly = false).hashCode()}"
@@ -315,7 +315,7 @@ private const val LOCAL = "https://reader.local/"
                 },onComplete = { complete() })
         } else key(keyValue) {
             AndroidView(modifier = Modifier.fillMaxSize().testTag("reader-content").semantics {
-                stateDescription = if(ready && turnFrame == null) "Página lista" else "Cargando página"
+                stateDescription = if(ready && turnFrame == null) tr(R.string.tr_449) else tr(R.string.tr_450)
             }, factory = { context ->
                 ReaderWebView(context).apply {
                     web = this; ready = false
@@ -338,8 +338,8 @@ private const val LOCAL = "https://reader.local/"
                     if(saved.epub) { onManualTouch = { if(voice.ownsPosition(account.key,id)) voice.readManually() }; onAnnotate = { if(web===this) toolMode="add" }; onDictionary = { if(web===this) toolMode="dictionary" } }
                     if(!saved.epub) imagePage = page
                     contentDescription = if(PageTurnPolicy.usesEdgeTaps(settings.pageTurnMode))
-                        "Lectura. Toca el centro para mostrar controles y los bordes para pasar página."
-                        else "Lectura. Toca para mostrar controles. Desliza para pasar página; con zoom, desde un extremo de la imagen."
+                        tr(R.string.tr_451)
+                        else tr(R.string.tr_452)
                     readingGestures(settings.rtl && !saved.epub, settings.pageTurnMode,
                         toggle = { if(web === this) { controls = !controls; controlEpoch++ } },
                         next = { if(web===this) nextPage() }, previous = { if(web===this) previousPage() })
@@ -353,8 +353,8 @@ private const val LOCAL = "https://reader.local/"
                     }
                     CookieManager.getInstance().setAcceptThirdPartyCookies(this, false)
                     val content = if(saved.epub) File(store.chapterDir(id), "$page.html").readText() else {
-                        val second = if(settings.imageMode == "double" && page + 1 < saved.readablePages) "<img src=\"${page+1}.img\" alt=\"Página ${page+2}\">" else ""
-                        "<div class=\"images ${settings.imageMode}\" data-page=\"$page\" data-total=\"${saved.readablePages}\" data-step=\"$step\" dir=\"${if(settings.rtl) "rtl" else "ltr"}\"><img src=\"$page.img\" alt=\"Página ${page+1}\">$second</div>"
+                        val second = if(settings.imageMode == "double" && page + 1 < saved.readablePages) "<img src=\"${page+1}.img\" alt=\"${tr(R.string.page_word)} ${page+2}\">" else ""
+                        "<div class=\"images ${settings.imageMode}\" data-page=\"$page\" data-total=\"${saved.readablePages}\" data-page-label=\"${tr(R.string.page_word)}\" data-step=\"$step\" dir=\"${if(settings.rtl) "rtl" else "ltr"}\"><img src=\"$page.img\" alt=\"${tr(R.string.page_word)} ${page+1}\">$second</div>"
                     }
                     val document = ReaderHtml.document(content, settings, saved.epub)
                     webViewClient = object: WebViewClient() {
@@ -434,117 +434,117 @@ private const val LOCAL = "https://reader.local/"
     }
     ReaderStatistics(store,id,page,ready && !showSettings && !showToc && !showBookmarks && !toolsBusy && !showTools && !finish && draftPage==null)
     if(saved.epub) EpubToolsUi(repo,store,saved,state,web,page,ready,toolMode,{ toolMode=null },{ toolsBusy=it }) { target,anchor,fromVoice -> changePage(target,anchor,fromVoice) }
-    if(showSettings) DisplayAlertDialog(onDismissRequest = { showSettings = false }, title = { Text("Opciones de lectura") }, text = { Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
+    if(showSettings) DisplayAlertDialog(onDismissRequest = { showSettings = false }, title = { Text(tr(R.string.tr_440)) }, text = { Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
         DisplaySettings()
         Row(verticalAlignment=Alignment.CenterVertically) {
-            Text("Guardar ajustes solo para esta obra",Modifier.weight(1f))
+            Text(tr(R.string.tr_454),Modifier.weight(1f))
             DisplaySwitch(saved.series.id in state.profiles,{ store.useSeriesProfile(saved.series.id,it) },modifier=Modifier.testTag("series-reader-profile"))
         }
-        Text(if(saved.series.id in state.profiles) "Los cambios de lectura se recuerdan para ${saved.series.name}. Las demás obras conservan sus ajustes." else "Se están usando los ajustes generales. Activa esta opción para personalizar solo esta obra.",style=MaterialTheme.typography.bodySmall)
-        DisplayTextButton(onClick = { leave(onDownloadMore) }) { Text("Ver ${saved.series.unitsName(state.libraries)} / Descargar más") }
+        Text(if(saved.series.id in state.profiles) tr(R.string.tr_455, saved.series.name) else tr(R.string.tr_456),style=MaterialTheme.typography.bodySmall)
+        DisplayTextButton(onClick = { leave(onDownloadMore) }) { Text(tr(R.string.tr_420, saved.series.unitsName(state.libraries))) }
         if(!saved.epub) {
-            Text("Modo de lectura",style = MaterialTheme.typography.titleSmall)
+            Text(tr(R.string.tr_457),style = MaterialTheme.typography.titleSmall)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("fit" to "Página completa", "width" to "Ajustar al ancho", "double" to "Doble página", "continuous" to "Vertical continuo").forEach { (value,label) -> DisplayChip(settings.imageMode == value, { if(value == "continuous" && !continuous) imageJump = ImageJump(page); store.readerSettings(saved.series.id) { it.copy(imageMode = value) } }, { Text(label) }, enabled=!(displayMode.eink && value=="continuous")) }
+            listOf("fit" to tr(R.string.tr_458), "width" to tr(R.string.tr_459), "double" to tr(R.string.tr_460), "continuous" to tr(R.string.tr_461)).forEach { (value,label) -> DisplayChip(settings.imageMode == value, { if(value == "continuous" && !continuous) imageJump = ImageJump(page); store.readerSettings(saved.series.id) { it.copy(imageMode = value) } }, { Text(label) }, enabled=!(displayMode.eink && value=="continuous")) }
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Continuar con el siguiente tomo/libro",Modifier.weight(1f))
+            Text(tr(R.string.tr_462),Modifier.weight(1f))
             DisplaySwitch(settings.autoAdvance, { value -> store.readerSettings(saved.series.id) { it.copy(autoAdvance = value) } })
         }
-        val unitName = if(saved.series.unitsName(state.libraries) == "libros") "Libro" else "Tomo"
-        Text("Cambiar de ${unitName.lowercase()}",style = MaterialTheme.typography.titleSmall)
+        val unitName = if(saved.series.isBook(state.libraries)) tr(R.string.tr_067) else tr(R.string.tr_064)
+        Text(tr(R.string.tr_463, unitName.lowercase()),style = MaterialTheme.typography.titleSmall)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(-1 to "$unitName anterior",1 to "$unitName siguiente").forEach { (direction,label) ->
+            listOf(-1 to tr(R.string.tr_464, unitName),1 to tr(R.string.tr_465, unitName)).forEach { (direction,label) ->
                 val target = saved.series.adjacent(state,id,direction)
                 DisplayOutlinedButton(enabled = target.available,onClick = { leave { onNext(target.chapter!!.id) } }) { Text(label) }
             }
         }
-        Text("Cambiar de tomo no marca el actual como terminado ni salta tomos que falten por descargar.",style = MaterialTheme.typography.bodySmall)
-        Text("Pasar página", style = MaterialTheme.typography.titleSmall)
+        Text(tr(R.string.tr_466),style = MaterialTheme.typography.bodySmall)
+        Text(tr(R.string.tr_467), style = MaterialTheme.typography.titleSmall)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("swipe" to "Arrastrando", "edges" to "Toque en los bordes").forEach { (value,label) ->
+            listOf("swipe" to tr(R.string.tr_468), "edges" to tr(R.string.tr_469)).forEach { (value,label) ->
                 DisplayChip(if(value == "edges") PageTurnPolicy.usesEdgeTaps(settings.pageTurnMode) else !PageTurnPolicy.usesEdgeTaps(settings.pageTurnMode),
                     { store.readerSettings(saved.series.id) { it.copy(pageTurnMode = value) } }, { Text(label) })
             }
         }
-        Text(if(continuous) "Desliza verticalmente para leer. Si eliges los bordes, estos saltan al inicio de la página anterior o siguiente. El centro muestra los controles." else if(PageTurnPolicy.usesEdgeTaps(settings.pageTurnMode))
-            "Toca el borde izquierdo o derecho para pasar página, también con zoom. Toca el centro para mostrar u ocultar controles. Arrastra para mover la imagen ampliada."
-            else "Desliza horizontalmente para pasar página. Con zoom, arrastra para recorrer la imagen; desde un extremo, vuelve a deslizar hacia fuera para cambiar de página. Toca para mostrar u ocultar controles.",
+        Text(if(continuous) tr(R.string.tr_470) else if(PageTurnPolicy.usesEdgeTaps(settings.pageTurnMode))
+            tr(R.string.tr_471)
+            else tr(R.string.tr_472),
             style = MaterialTheme.typography.bodySmall)
-        if(!continuous) Text("Los bordes responden al soltar el dedo. Amplía con la pinza o con doble toque en el centro. Se respeta la dirección de lectura del manga.",style = MaterialTheme.typography.bodySmall)
-        Text("Efecto de paso de página", style = MaterialTheme.typography.titleSmall)
+        if(!continuous) Text(tr(R.string.tr_473),style = MaterialTheme.typography.bodySmall)
+        Text(tr(R.string.tr_474), style = MaterialTheme.typography.titleSmall)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("none" to "Sin efecto", "curl" to "Hoja").forEach { (value,label) ->
+            listOf("none" to tr(R.string.tr_475), "curl" to tr(R.string.tr_476)).forEach { (value,label) ->
                 DisplayChip(if(value == "curl") settings.pageTurnEffect == "curl" else settings.pageTurnEffect != "curl",
                     { store.readerSettings(saved.series.id) { it.copy(pageTurnEffect = value) } }, { Text(label) }, enabled = !continuous && !displayMode.eink)
             }
         }
-        Text(if(continuous) "El efecto Hoja se aplica solo al lector paginado. Tu elección se conserva al volver a ese modo." else "Hoja simula el pliegue al avanzar o retroceder, por arrastre o toque y también con zoom. Si Android desactiva las animaciones, se pasa sin efecto.",style = MaterialTheme.typography.bodySmall)
+        Text(if(continuous) tr(R.string.tr_477) else tr(R.string.tr_478),style = MaterialTheme.typography.bodySmall)
         Row(verticalAlignment=Alignment.CenterVertically) {
-            Text("Pasar página con volumen",Modifier.weight(1f))
+            Text(tr(R.string.tr_479),Modifier.weight(1f))
             DisplaySwitch(settings.volumeKeys,{ value -> store.readerSettings(saved.series.id) { it.copy(volumeKeys=value) } })
         }
-        Text("Volumen − avanza; volumen + retrocede. Durante la voz o con un diálogo abierto, los botones siguen controlando el audio.",style=MaterialTheme.typography.bodySmall)
-        Text("Orientación")
+        Text(tr(R.string.tr_480),style=MaterialTheme.typography.bodySmall)
+        Text(tr(R.string.tr_481))
         FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-            listOf("auto" to "Automática","portrait" to "Vertical","landscape" to "Horizontal").forEach { (value,label) ->
+            listOf("auto" to tr(R.string.tr_482),"portrait" to tr(R.string.tr_483),"landscape" to tr(R.string.tr_484)).forEach { (value,label) ->
                 DisplayChip(settings.orientation==value,{ store.readerSettings(saved.series.id) { it.copy(orientation=value) } },{ Text(label) })
             }
         }
-        Text("Tema")
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("dark" to "Noche", "sepia" to "Sepia", "light" to "Día").forEach { (value,label) -> DisplayChip(settings.theme == value, { store.readerSettings(saved.series.id) { it.copy(theme = value) } }, { Text(label) },enabled=!displayMode.eink) } }
+        Text(tr(R.string.tr_485))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("dark" to tr(R.string.tr_486), "sepia" to tr(R.string.tr_487), "light" to tr(R.string.tr_488)).forEach { (value,label) -> DisplayChip(settings.theme == value, { store.readerSettings(saved.series.id) { it.copy(theme = value) } }, { Text(label) },enabled=!displayMode.eink) } }
         if(saved.epub) {
-            Text("Tamaño de letra · ${settings.fontSize}")
+            Text(tr(R.string.tr_489, settings.fontSize))
             Slider(settings.fontSize.toFloat(), { value -> store.readerSettings(saved.series.id) { it.copy(fontSize = value.toInt()) } }, valueRange = 12f..32f)
-            Text("Interlineado · %.1f".format(settings.lineHeight))
+            Text(tr(R.string.tr_490).format(AppLanguage.locale, settings.lineHeight))
             Slider(settings.lineHeight, { value -> store.readerSettings(saved.series.id) { it.copy(lineHeight = value) } }, valueRange = 1.2f..2.2f)
-            Text("Márgenes")
+            Text(tr(R.string.tr_491))
             Slider(settings.margin.toFloat(), { value -> store.readerSettings(saved.series.id) { it.copy(margin = value.toInt()) } }, valueRange = 8f..48f)
-            Row { Text("Tipografía con serif", Modifier.weight(1f)); DisplaySwitch(settings.serif, { value -> store.readerSettings(saved.series.id) { it.copy(serif = value) } }) }
+            Row { Text(tr(R.string.tr_492), Modifier.weight(1f)); DisplaySwitch(settings.serif, { value -> store.readerSettings(saved.series.id) { it.copy(serif = value) } }) }
         } else {
-            Row { Text("Manga: derecha a izquierda", Modifier.weight(1f)); DisplaySwitch(settings.rtl, { value -> store.readerSettings(saved.series.id) { it.copy(rtl = value) } }) }
-            Text(if(continuous) "Desliza hacia arriba o abajo para leer sin cortes. Los bordes y el selector saltan al inicio de una página. Se guarda el punto dentro de la imagen en este móvil. Para ampliar o usar el efecto Hoja, vuelve a Página completa." else "Puedes ampliar con dos dedos.", style = MaterialTheme.typography.bodySmall)
+            Row { Text(tr(R.string.tr_493), Modifier.weight(1f)); DisplaySwitch(settings.rtl, { value -> store.readerSettings(saved.series.id) { it.copy(rtl = value) } }) }
+            Text(if(continuous) tr(R.string.tr_494) else tr(R.string.tr_495), style = MaterialTheme.typography.bodySmall)
         }
-    } }, confirmButton = { DisplayTextButton(onClick = { showSettings = false }) { Text("Listo") } })
+    } }, confirmButton = { DisplayTextButton(onClick = { showSettings = false }) { Text(tr(R.string.tr_260)) } })
     waitingPage?.let { target ->
         val needed = if(!saved.epub && !continuous && step==2) minOf(target+1,total-1) else target
-        DisplayAlertDialog(onDismissRequest={ waitingPage=null },title={ Text("Esperando descarga") },
-            text={ Text("${saved.readablePages}/$total páginas o secciones disponibles. ${saved.state}. No se marca la lectura como terminada.") },
-            confirmButton={ DisplayTextButton(enabled=saved.hasPage(needed),onClick={ waitingPage=null;changePage(target,waitingAnchor) }) { Text("Continuar aquí") } },
-            dismissButton={ DisplayTextButton(onClick={ waitingPage=null }) { Text("Seguir en esta página") } })
+        DisplayAlertDialog(onDismissRequest={ waitingPage=null },title={ Text(tr(R.string.tr_496)) },
+            text={ Text(tr(R.string.tr_497, saved.readablePages, total, localizedStatus(saved.state))) },
+            confirmButton={ DisplayTextButton(enabled=saved.hasPage(needed),onClick={ waitingPage=null;changePage(target,waitingAnchor) }) { Text(tr(R.string.tr_498)) } },
+            dismissButton={ DisplayTextButton(onClick={ waitingPage=null }) { Text(tr(R.string.tr_499)) } })
     }
-    if(imageError) DisplayAlertDialog(onDismissRequest = { imageError = false },title = { Text("No se pudo abrir esta página") },
-        text = { Text("Se conserva la página anterior y tu progreso. Puedes reintentar el cambio; si persiste, vuelve a descargar este tomo.") },
-        confirmButton = { DisplayTextButton(onClick = { imageError = false }) { Text("Aceptar") } })
+    if(imageError) DisplayAlertDialog(onDismissRequest = { imageError = false },title = { Text(tr(R.string.tr_500)) },
+        text = { Text(tr(R.string.tr_501)) },
+        confirmButton = { DisplayTextButton(onClick = { imageError = false }) { Text(tr(R.string.tr_163)) } })
     if(showBookmarks) DisplayBottomSheet(onDismissRequest = { showBookmarks = false },
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         val bookmarks = state.bookmarks.filter { it.chapterId == id && !it.deleted }.sortedWith(compareBy({ it.page }, { it.createdAt }))
         LazyColumn(Modifier.fillMaxWidth().heightIn(max = 600.dp).testTag("bookmark-list"),
             contentPadding = PaddingValues(bottom = 24.dp), flingBehavior=displayFling()) {
-            item { Text("Marcadores", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(20.dp)) }
-            item { Text(if(state.settings.preferLocalChanges) "Se sincronizan con Kavita al conectar. Tienen prioridad los cambios de este móvil."
-                else "Se sincronizan con Kavita al conectar. Los conflictos se revisan en Progreso.", modifier = Modifier.padding(horizontal = 20.dp), style = MaterialTheme.typography.bodySmall) }
-            item { DisplayButton(onClick = { bookmarkHere() }, enabled = ready, modifier = Modifier.padding(20.dp, 8.dp)) { Text("Marcar esta posición") } }
-            if(bookmarks.isEmpty()) item { Text("Todavía no hay marcadores", Modifier.padding(20.dp)) }
+            item { Text(tr(R.string.tr_438), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(20.dp)) }
+            item { Text(if(state.settings.preferLocalChanges) tr(R.string.tr_502)
+                else tr(R.string.tr_503), modifier = Modifier.padding(horizontal = 20.dp), style = MaterialTheme.typography.bodySmall) }
+            item { DisplayButton(onClick = { bookmarkHere() }, enabled = ready, modifier = Modifier.padding(20.dp, 8.dp)) { Text(tr(R.string.tr_504)) } }
+            if(bookmarks.isEmpty()) item { Text(tr(R.string.tr_505), Modifier.padding(20.dp)) }
             items(bookmarks, key = { it.id }) { b ->
                 val compatible = b.edition.sameEdition(saved.chapter) && b.page in 0 until total
                 ListItem(headlineContent = { Text(b.title) }, supportingContent = {
-                    Text("Página ${b.page + 1} · " + if(!compatible) "Otra edición" else if(b.conflict && !state.settings.preferLocalChanges) "Conflicto: revisar en Progreso" else if(b.dirty) "Pendiente de sincronizar" else "Sincronizado")
+                    Text(tr(R.string.tr_506, b.page + 1) + if(!compatible) tr(R.string.tr_507) else if(b.conflict && !state.settings.preferLocalChanges) tr(R.string.tr_508) else if(b.dirty) tr(R.string.tr_509) else tr(R.string.tr_510))
                 }, leadingContent = { DisplayTextButton(enabled = compatible, onClick = {
                     showBookmarks = false; changePage(b.page, b.scroll.orEmpty())
-                }) { Text("Ir") } }, trailingContent = { DisplayIconButton(onClick = { store.removeBookmark(b.id); Jobs.sync(repo.context, account.key) }) {
-                    Icon(Icons.Outlined.DeleteOutline, "Eliminar marcador ${b.title}")
+                }) { Text(tr(R.string.tr_141)) } }, trailingContent = { DisplayIconButton(onClick = { store.removeBookmark(b.id); Jobs.sync(repo.context, account.key) }) {
+                    Icon(Icons.Outlined.DeleteOutline, tr(R.string.tr_511, b.title))
                 } })
             }
         }
     }
-    if(draftPage != null) DisplayAlertDialog(onDismissRequest = { draftPage = null }, title = { Text("Guardar marcador") },
-        text = { OutlinedTextField(draftTitle, { draftTitle = it.take(100) }, label = { Text("Nombre del marcador") }, singleLine = true) },
+    if(draftPage != null) DisplayAlertDialog(onDismissRequest = { draftPage = null }, title = { Text(tr(R.string.tr_512)) },
+        text = { OutlinedTextField(draftTitle, { draftTitle = it.take(100) }, label = { Text(tr(R.string.tr_513)) }, singleLine = true) },
         confirmButton = { DisplayTextButton(onClick = {
             store.addBookmark(id, draftPage!!, draftScroll, draftTitle); draftPage = null
             Jobs.sync(repo.context, account.key)
-        }) { Text("Guardar") } }, dismissButton = { DisplayTextButton(onClick = { draftPage = null }) { Text("Cancelar") } })
+        }) { Text(tr(R.string.tr_160)) } }, dismissButton = { DisplayTextButton(onClick = { draftPage = null }) { Text(tr(R.string.tr_161)) } })
     if(showToc) ReaderNavigator(repo,account,saved,state,page,scrollTarget,navigatorSection,
         onDismiss = { showToc = false; controlEpoch++ },
         onChapter = { target ->
@@ -556,14 +556,14 @@ private const val LOCAL = "https://reader.local/"
         onDownloadMore = { leave(onDownloadMore) })
     if(finish) {
         val next = saved.series.successor(state,id)
-        DisplayAlertDialog(onDismissRequest = { finish = false }, title = { Text("Lectura completada") },
-            text = { Text("Guardada como leída. " + when {
-                next.available -> "Puedes seguir con ${next.chapter!!.labelFor(saved.series,state.libraries)}."
-                next.chapter != null -> "${next.chapter.labelFor(saved.series,state.libraries)} no está descargado o cambió de edición. Descárgalo desde Biblioteca para continuar. No se salta ningún tomo."
-                else -> "Has llegado al final del catálogo guardado de esta obra."
+        DisplayAlertDialog(onDismissRequest = { finish = false }, title = { Text(tr(R.string.tr_514)) },
+            text = { Text(tr(R.string.tr_515) + when {
+                next.available -> tr(R.string.tr_516, next.chapter!!.labelFor(saved.series,state.libraries))
+                next.chapter != null -> tr(R.string.tr_517, next.chapter.labelFor(saved.series,state.libraries))
+                else -> tr(R.string.tr_518)
             }) },
-            confirmButton = { DisplayTextButton(onClick = { finish = false; if(next.available) onNext(next.chapter!!.id) else close() }) { Text(if(next.available) "Continuar lectura" else "Volver a la biblioteca") } },
-            dismissButton = { DisplayTextButton(onClick = { finish = false }) { Text("Quedarme aquí") } })
+            confirmButton = { DisplayTextButton(onClick = { finish = false; if(next.available) onNext(next.chapter!!.id) else close() }) { Text(if(next.available) tr(R.string.tr_519) else tr(R.string.tr_520)) } },
+            dismissButton = { DisplayTextButton(onClick = { finish = false }) { Text(tr(R.string.tr_521)) } })
     }
 }
 private fun denied() = WebResourceResponse("text/plain", "UTF-8", 403, "Blocked", emptyMap(), ByteArrayInputStream(ByteArray(0)))

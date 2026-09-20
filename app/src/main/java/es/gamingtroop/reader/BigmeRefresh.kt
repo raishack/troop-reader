@@ -3,9 +3,9 @@ package es.gamingtroop.reader
 import java.lang.reflect.Modifier
 
 enum class BigmeApiStatus(val label: String) {
-    ABSENT("API Bigme no encontrada"), UNSUPPORTED("API Bigme no compatible"),
-    BLOCKED("Acceso al refresco Bigme bloqueado"), AVAILABLE("API Bigme detectada · experimental"),
-    FAILED("La solicitud Bigme falló; se usa repintado compatible")
+    ABSENT(tr(R.string.tr_037)), UNSUPPORTED(tr(R.string.tr_038)),
+    BLOCKED(tr(R.string.tr_039)), AVAILABLE(tr(R.string.tr_040)),
+    FAILED(tr(R.string.tr_041))
 }
 internal fun interface RefreshRequest { fun request(): Boolean }
 internal data class BigmeProbe(val status: BigmeApiStatus, val driver: RefreshRequest? = null)

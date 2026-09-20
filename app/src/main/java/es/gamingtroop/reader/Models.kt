@@ -18,7 +18,7 @@ fun hash(value: String) = MessageDigest.getInstance("SHA-256").digest(value.toBy
 @Serializable data class Chapter(val id: Int, val volumeId: Int = 0, val titleName: String = "",
     val title: String = "", val range: String = "", val pages: Int = 0, val pagesRead: Int = 0,
     val format: Int? = null, val lastModifiedUtc: String = "", val displayTitle: String = "") {
-    val label get() = displayTitle.ifBlank { titleName.ifBlank { title.ifBlank { "${if(format == 3 || format == 4) "Libro" else "Tomo"} ${range.ifBlank { id.toString() }}" } } }
+    val label get() = displayTitle.let { if(it == titleName || it == title) it else localizedGeneratedLabel(it) }.ifBlank { titleName.ifBlank { title.ifBlank { "${if(format == 3 || format == 4) tr(R.string.tr_067) else tr(R.string.tr_064)} ${range.ifBlank { id.toString() }}" } } }
 }
 @Serializable data class Volume(val id: Int, val name: String = "", val chapters: List<Chapter> = emptyList())
 @Serializable data class Toc(val title: String, val part: String = "", val page: Int, val children: List<Toc> = emptyList())
@@ -30,9 +30,9 @@ fun hash(value: String) = MessageDigest.getInstance("SHA-256").digest(value.toBy
     val conflict: Progress? = null, val error: String? = null, val restored: Boolean = false)
 @Serializable data class SavedChapter(val chapter: Chapter, val series: Series, val epub: Boolean,
     val ready: Boolean = false, val downloadedPages: Int = 0, val totalBytes: Long = 0,
-    val state: String = "Pendiente", val toc: List<Toc> = emptyList(), val lastReadAt: Long = 0,
+    val state: String = canonicalText(R.string.tr_268), val toc: List<Toc> = emptyList(), val lastReadAt: Long = 0,
     val downloadRequested: Boolean? = null, val downloadRequestId: String = "", val automatic: Boolean = false) {
-    val inQueue get() = !ready && state != "Eliminado del dispositivo"
+    val inQueue get() = !ready && state != canonicalText(R.string.tr_269)
     val readablePages get() = if(ready) chapter.pages else downloadedPages.coerceIn(0,chapter.pages)
     val readable get() = readablePages > 0 && (ready || inQueue)
     fun hasPage(page: Int) = readable && page in 0 until readablePages
@@ -62,7 +62,7 @@ fun hash(value: String) = MessageDigest.getInstance("SHA-256").digest(value.toBy
     val bookmarks: List<Bookmark> = emptyList(),
     val bookmarkIssues: Map<Int, String> = emptyMap(),
     val catalog: Map<Int, List<Volume>> = emptyMap(),
-    val lastSync: Long = 0, val syncMessage: String = "Sin sincronizar",
+    val lastSync: Long = 0, val syncMessage: String = canonicalText(R.string.tr_270),
     val imagePositions: Map<Int, ImagePosition> = emptyMap(),
     val profiles: Map<Int, ReaderProfile> = emptyMap(), val favorites: Set<Int> = emptySet(),
     val collections: List<PersonalCollection> = emptyList(), val followed: Map<Int, FollowedSeries> = emptyMap(),

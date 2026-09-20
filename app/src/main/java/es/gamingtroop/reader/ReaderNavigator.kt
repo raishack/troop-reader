@@ -77,20 +77,20 @@ fun activeToc(entries: List<ReaderTocEntry>, page: Int, position: String): Int {
                         style = if(compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.bodySmall, color = Green,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                DisplayIconButton(onClick = { number = (page + 1).toString(); jump = true }) { Icon(Icons.Outlined.Numbers,if(saved.epub) "Ir a sección" else "Ir a página") }
-                if(compact) DisplayIconButton(onClick = onDownloadMore) { Icon(Icons.Outlined.CloudDownload,"Descargar más") }
-                DisplayIconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close,"Cerrar selector") }
+                DisplayIconButton(onClick = { number = (page + 1).toString(); jump = true }) { Icon(Icons.Outlined.Numbers,if(saved.epub) tr(R.string.tr_405) else tr(R.string.tr_406)) }
+                if(compact) DisplayIconButton(onClick = onDownloadMore) { Icon(Icons.Outlined.CloudDownload,tr(R.string.tr_198)) }
+                DisplayIconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close,tr(R.string.tr_407)) }
             }
             Row(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DisplayChip(section == "units", { section = "units" }, { Text(unitName) }, modifier = Modifier.testTag("navigator-units"))
-                DisplayChip(section == "pages", { section = "pages" }, { Text(if(saved.epub) "Índice" else "Páginas") }, modifier = Modifier.testTag("navigator-pages"))
+                DisplayChip(section == "pages", { section = "pages" }, { Text(if(saved.epub) "Índice" else tr(R.string.tr_408)) }, modifier = Modifier.testTag("navigator-pages"))
                 if(compact && section == "units") {
-                    DisplayIconButton(onClick = { searchOpen = !searchOpen }) { Icon(Icons.Outlined.Search,"Buscar tomos o libros") }
-                    if(query.isNotBlank() && !searchOpen) DisplayTextButton(onClick = { query = "" }) { Text("Borrar filtro") }
+                    DisplayIconButton(onClick = { searchOpen = !searchOpen }) { Icon(Icons.Outlined.Search,tr(R.string.tr_409)) }
+                    if(query.isNotBlank() && !searchOpen) DisplayTextButton(onClick = { query = "" }) { Text(tr(R.string.tr_410)) }
                 }
             }
             if(section == "units") {
-                if(!compact || searchOpen) OutlinedTextField(query, { query = it }, singleLine = true, label = { Text("Buscar ${saved.series.unitsName(state.libraries)}") },
+                if(!compact || searchOpen) OutlinedTextField(query, { query = it }, singleLine = true, label = { Text(tr(R.string.tr_411, saved.series.unitsName(state.libraries))) },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = {
                         focus.clearFocus(); keyboard?.hide(); searchOpen = false
                     }),
@@ -99,7 +99,7 @@ fun activeToc(entries: List<ReaderTocEntry>, page: Int, position: String): Int {
                 val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentUnit.coerceAtLeast(0))
                 LaunchedEffect(query) { if(query.isNotEmpty()) listState.scrollToItem(0) }
                 LazyColumn(state = listState, modifier = Modifier.weight(1f).testTag("navigator-unit-list"), contentPadding = PaddingValues(vertical = 8.dp), flingBehavior=displayFling()) {
-                    if(list.isEmpty()) item { Text("Sin resultados en el catálogo guardado",Modifier.padding(20.dp)) }
+                    if(list.isEmpty()) item { Text(tr(R.string.tr_412),Modifier.padding(20.dp)) }
                     items(list,key = { it.key }) { unit ->
                         val isCurrent = unit.chapters.any { it.id == saved.chapter.id }
                         val target = if(isCurrent) saved.chapter.id else unit.next(state)
@@ -111,11 +111,11 @@ fun activeToc(entries: List<ReaderTocEntry>, page: Int, position: String): Int {
                                 .clickable(enabled = available) { target?.let(onChapter) },
                                 leadingContent = { Cover(repo,account,unit.cover,unit.title,Modifier.size(48.dp,70.dp),fallback = CoverRef("series",saved.series.id)) },
                                 headlineContent = { Text(unit.title) },
-                                supportingContent = { Text((if(isCurrent) "Actual · " else "") + unit.readingLabel(state) + " · " + when {
-                                    readyCount == unit.chapters.size -> "Descargado"
-                                    readyCount > 0 -> "$readyCount/${unit.chapters.size} partes descargadas"
-                                    available -> "Descarga parcial · puedes empezar a leer"
-                                    else -> "Sin descargar"
+                                supportingContent = { Text((if(isCurrent) tr(R.string.tr_413) else "") + unit.readingLabel(state) + " · " + when {
+                                    readyCount == unit.chapters.size -> tr(R.string.tr_195)
+                                    readyCount > 0 -> tr(R.string.tr_414, readyCount, unit.chapters.size)
+                                    available -> tr(R.string.tr_415)
+                                    else -> tr(R.string.tr_416)
                                 }) },
                                 trailingContent = { Icon(if(available) Icons.Outlined.MenuBook else Icons.Outlined.CloudDownload, null) })
                         }
@@ -124,23 +124,23 @@ fun activeToc(entries: List<ReaderTocEntry>, page: Int, position: String): Int {
                             val playable = state.playable(c)
                             ListItem(modifier = Modifier.padding(start = 24.dp).testTag("navigator-part-${c.id}")
                                 .semantics { selected = current }.clickable(enabled = playable) { onChapter(c.id) },
-                                headlineContent = { Text("Parte ${number + 1}") },
-                                supportingContent = { Text((if(current) "Actual · " else "") + if(!playable) "Sin descargar" else if(state.isRead(c)) "Leído" else "Página ${state.position(c) + 1} / ${c.pages}") })
+                                headlineContent = { Text(tr(R.string.tr_417, number + 1)) },
+                                supportingContent = { Text((if(current) tr(R.string.tr_413) else "") + if(!playable) tr(R.string.tr_416) else if(state.isRead(c)) tr(R.string.tr_418) else tr(R.string.tr_419, state.position(c) + 1, c.pages)) })
                         }
                     }
                 }
-                if(!compact) DisplayTextButton(onClick = onDownloadMore,modifier = Modifier.fillMaxWidth()) { Text("Ver ${saved.series.unitsName(state.libraries)} / Descargar más") }
+                if(!compact) DisplayTextButton(onClick = onDownloadMore,modifier = Modifier.fillMaxWidth()) { Text(tr(R.string.tr_420, saved.series.unitsName(state.libraries))) }
             } else if(saved.epub) {
-                if(index.isEmpty()) Text("Este libro no incluye índice. Puedes elegir una sección.",Modifier.padding(16.dp),style = MaterialTheme.typography.bodySmall)
+                if(index.isEmpty()) Text(tr(R.string.tr_421),Modifier.padding(16.dp),style = MaterialTheme.typography.bodySmall)
                 val listState = rememberLazyListState(initialFirstVisibleItemIndex = active.coerceAtLeast(0))
                 LazyColumn(state = listState, modifier = Modifier.weight(1f).testTag("navigator-toc"), contentPadding = PaddingValues(bottom = 20.dp), flingBehavior=displayFling()) {
                     if(index.isEmpty()) items(saved.chapter.pages) { i ->
-                        ListItem(headlineContent = { Text("Sección ${i + 1}") }, modifier = Modifier.testTag("navigator-section-$i")
+                        ListItem(headlineContent = { Text(tr(R.string.tr_137, i + 1)) }, modifier = Modifier.testTag("navigator-section-$i")
                             .semantics { selected = page == i }.clickable { onPage(i, "") })
                     }
                     items(index.size) { i ->
                         val row = index[i]
-                        ListItem(headlineContent = { Text(row.entry.title) }, supportingContent = { Text("Sección ${row.entry.page + 1}" + if(i == active) " · Actual" else "") },
+                        ListItem(headlineContent = { Text(row.entry.title) }, supportingContent = { Text(tr(R.string.tr_137, row.entry.page + 1) + if(i == active) tr(R.string.tr_422) else "") },
                             modifier = Modifier.padding(start = (row.depth.coerceAtMost(5)*12).dp).testTag("navigator-toc-$i")
                                 .semantics { selected = i == active }.clickable { onPage(row.entry.page, row.entry.anchor()) })
                     }
@@ -148,14 +148,14 @@ fun activeToc(entries: List<ReaderTocEntry>, page: Int, position: String): Int {
             } else {
                 val gridState = rememberLazyGridState(initialFirstVisibleItemIndex = page)
                 val dir = remember(saved.chapter.id) { repo.store(account.key).chapterDir(saved.chapter.id) }
-                Text("Toca una miniatura para ir a esa página",Modifier.padding(horizontal = 16.dp),style = MaterialTheme.typography.bodySmall)
+                Text(tr(R.string.tr_423),Modifier.padding(horizontal = 16.dp),style = MaterialTheme.typography.bodySmall)
                 LazyVerticalGrid(GridCells.Adaptive(96.dp),state = gridState,modifier = Modifier.weight(1f).testTag("navigator-page-grid"),
                     contentPadding = PaddingValues(16.dp),horizontalArrangement = Arrangement.spacedBy(10.dp),verticalArrangement = Arrangement.spacedBy(10.dp), flingBehavior=displayFling()) {
                     items(saved.chapter.pages,key = { it }) { i ->
                         DisplayCard(onClick = { onPage(i,"") }, modifier = Modifier.testTag("navigator-page-$i").semantics { selected = i == page },
                             colors = CardDefaults.cardColors(containerColor = if(i == page) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant)) {
-                            DisplayImage(File(dir,"$i.img"),"Vista previa de página ${i + 1}",Modifier.fillMaxWidth().aspectRatio(.7f),contentScale = ContentScale.Fit)
-                            Text("${i + 1}" + if(i == page) " · Actual" else "",Modifier.padding(8.dp),style = MaterialTheme.typography.labelMedium)
+                            DisplayImage(File(dir,"$i.img"),tr(R.string.tr_424, i + 1),Modifier.fillMaxWidth().aspectRatio(.7f),contentScale = ContentScale.Fit)
+                            Text("${i + 1}" + if(i == page) tr(R.string.tr_422) else "",Modifier.padding(8.dp),style = MaterialTheme.typography.labelMedium)
                         }
                     }
                 }
@@ -163,17 +163,17 @@ fun activeToc(entries: List<ReaderTocEntry>, page: Int, position: String): Int {
         }
     }
     if(jump) DisplayAlertDialog(onDismissRequest = { jump = false },
-        title = { Text(if(saved.epub) "Ir a sección" else "Ir a página") },
+        title = { Text(if(saved.epub) tr(R.string.tr_405) else tr(R.string.tr_406)) },
         text = { Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
-            Text(if(saved.epub) "El EPUB tiene ${saved.chapter.pages} secciones; su paginación cambia con la letra." else "Elige una página entre 1 y ${saved.chapter.pages}.")
+            Text(if(saved.epub) tr(R.string.tr_425, saved.chapter.pages) else tr(R.string.tr_426, saved.chapter.pages))
             OutlinedTextField(number, { value -> number = value.filter { it in '0'..'9' }.take(9) },
-                label = { Text(if(saved.epub) "Número de sección" else "Número de página") },singleLine = true,
+                label = { Text(if(saved.epub) tr(R.string.tr_427) else tr(R.string.tr_428)) },singleLine = true,
                 isError = number.isNotBlank() && jumpPage == null,
-                supportingText = { if(number.isNotBlank() && jumpPage == null) Text("Introduce un número entre 1 y ${saved.chapter.pages}") },
+                supportingText = { if(number.isNotBlank() && jumpPage == null) Text(tr(R.string.tr_429, saved.chapter.pages)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number,imeAction = ImeAction.Go),
                 keyboardActions = KeyboardActions(onGo = { if(jumpPage != null) { keyboard?.hide(); submitJump() } }),
                 modifier = Modifier.testTag("jump-number"))
         } },
-        confirmButton = { DisplayTextButton(enabled = jumpPage != null,onClick = { keyboard?.hide(); submitJump() },modifier = Modifier.testTag("jump-confirm")) { Text("Ir") } },
-        dismissButton = { DisplayTextButton(onClick = { jump = false }) { Text("Cancelar") } })
+        confirmButton = { DisplayTextButton(enabled = jumpPage != null,onClick = { keyboard?.hide(); submitJump() },modifier = Modifier.testTag("jump-confirm")) { Text(tr(R.string.tr_141)) } },
+        dismissButton = { DisplayTextButton(onClick = { jump = false }) { Text(tr(R.string.tr_161)) } })
 }

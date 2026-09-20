@@ -1,13 +1,27 @@
-# Validación y pendientes
+# Validation and remaining limitations
 
-Resultados archivados de alpha21: **181 pruebas locales y 9 pruebas Android dirigidas distintas**, lint sin errores. Las pruebas Android completas de alpha20 no se repitieron íntegramente en alpha21; no sumar ejecuciones repetidas como cobertura nueva. Actualización alpha20→21 comprobada con 25 archivos de ensayo conservados, perfil e-ink preservado y refresco Bigme inicialmente desactivado.
+## Alpha22 — bilingual interface
 
-Los resultados históricos no equivalen a ejecutar esta suite en cualquier máquina. El repositorio permite reproducir las pruebas; requiere regenerar la APK de ensayo con firma propia y preparar el emulador según BUILD.
+The language selector is available at sign-in and in Settings. Dedicated Android tests cover switching in both directions, reopening the app, preserving account state and English reader/e-ink controls. Unit tests verify resource placeholders, dynamic labels and compatibility with historical queue markers.
 
-Pendientes: validar ghosting/latencia en Bigme físico; rendimiento con grandes bibliotecas, batería y descargas largas en hardware; aceptación de las funciones recientes en dispositivos del usuario. No prometer eliminación total de ghosting ni inmunidad a conflictos simultáneos de servidor.
+Final release results are recorded in the release notes after validation. A successful emulator run is not evidence of physical e-ink refresh quality.
 
-El ensayo Kavita 0.9.1.4 se describe en KAVITA-UPGRADE. Es validación de API y conector, no una nueva suite Android completa.
+## Previous releases
 
-## Revisión de publicación GitHub (19/09/2026)
+Archived alpha21 results: **181 unit tests and 9 distinct targeted Android tests**, with no lint errors. Alpha20's complete Android suite was not repeated for alpha21. Repeated runs are not counted as new coverage. The alpha20-to-alpha21 upgrade preserved 25 fixture files and the e-ink profile, with experimental Bigme refresh initially disabled.
 
-La copia pública se compiló desde su directorio separado: 181 pruebas de lógica pasadas, lint sin errores y APK debug generada. Fuentes de `app/src/main` idénticas al proyecto alpha21. Se probó la generación local de la APK de ensayo y se comprobó su firma contra la app local. No se volvió a ejecutar toda la suite de Android en esta publicación documental. El análisis Gitleaks no encontró secretos.
+The initial public checkout was built independently, with 181 unit tests, lint and the debug build passing. Main application sources matched alpha21. The locally generated updater fixture was checked against the local app certificate. Gitleaks found no secrets.
+
+## Reproducing checks
+
+See [BUILD](BUILD.md). Generate the updater fixture with your own development certificate and use a disposable emulator with an offline TTS voice. Never run destructive fixture tests on a personal device. Historical results do not imply the suite has run on every machine or firmware.
+
+The Kavita 0.9.1.4 rehearsal is described in [KAVITA-UPGRADE](KAVITA-UPGRADE.md). It validates API and connector compatibility, not a complete Android test run.
+
+## Still requires physical-device validation
+
+- Bigme ghosting, latency and colour/monochrome contrast.
+- Large libraries, battery consumption and prolonged background downloads.
+- User acceptance of recently added reader features.
+
+Do not promise complete ghosting removal or immunity to concurrent server updates.

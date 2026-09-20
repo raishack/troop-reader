@@ -21,7 +21,7 @@
       if (cache.has(page)) return cache.get(page);
       const entry = {nodes: [], ready: false, pixels: 0};
       for (let p = page; p < Math.min(page + step, total); p++) {
-        const img = new Image(); img.alt = 'Página ' + (p + 1); img.src = p + '.img';
+        const img = new Image(); img.alt = (document.querySelector('.images')?.dataset.pageLabel || 'Page') + ' ' + (p + 1); img.src = p + '.img';
         entry.nodes.push(img);
       }
       entry.promise = Promise.all(entry.nodes.map(img => img.decode())).then(() => {

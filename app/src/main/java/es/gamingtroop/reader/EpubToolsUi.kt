@@ -54,18 +54,18 @@ import kotlinx.serialization.json.*
         searching=true;error=null
         try { delay(250);hits=withContext(Dispatchers.IO) { EpubText.search(store,saved,query) } }
         catch(e: CancellationException) { throw e }
-        catch(_: Exception) { error="No se pudo buscar en el libro descargado." }
+        catch(_: Exception) { error=tr(R.string.tr_123) }
         finally { searching=false }
     }
     LaunchedEffect(mode,web) {
         if(mode!="add") return@LaunchedEffect
         val selectedPage=page
-        if(!ready || web==null) { error="Espera a que la sección esté lista.";close();return@LaunchedEffect }
+        if(!ready || web==null) { error=tr(R.string.tr_124);close();return@LaunchedEffect }
         web.evaluateJavascript("window.troopSelection && window.troopSelection()") { result ->
             val selection=runCatching { codec.parseToJsonElement(result).jsonObject }.getOrNull()
             val quote=selection?.get("quote")?.jsonPrimitive?.contentOrNull
             if(quote.isNullOrBlank() || quote.length>10000) error=selection?.get("error")?.jsonPrimitive?.contentOrNull
-                ?: "Mantén pulsado el texto y selecciona un fragmento de un párrafo antes de añadir una nota."
+                ?: tr(R.string.tr_125)
             else {
                 draft=BookNote(java.util.UUID.randomUUID().toString(),saved.chapter.id,saved.chapter,selectedPage,
                     selection.getValue("block").jsonPrimitive.int,selection.getValue("start").jsonPrimitive.int,
@@ -85,53 +85,53 @@ import kotlinx.serialization.json.*
             }
         }
     }
-    if(mode=="dictionary") DisplayAlertDialog(onDismissRequest=close,title={ Text("Diccionario") },text={ Column {
-        OutlinedTextField(dictionaryText,{ dictionaryText=it.take(200) },label={ Text("Palabra o texto seleccionado") },singleLine=true)
-        Text("Elige una aplicación instalada para consultar solo este fragmento. Su disponibilidad offline depende de los diccionarios que tenga descargados.")
-        if(dictionaryTargets.isEmpty()) Text("No hay aplicaciones compatibles instaladas. Instala un diccionario con la acción Procesar texto de Android.")
+    if(mode=="dictionary") DisplayAlertDialog(onDismissRequest=close,title={ Text(tr(R.string.tr_126)) },text={ Column {
+        OutlinedTextField(dictionaryText,{ dictionaryText=it.take(200) },label={ Text(tr(R.string.tr_127)) },singleLine=true)
+        Text(tr(R.string.tr_128))
+        if(dictionaryTargets.isEmpty()) Text(tr(R.string.tr_129))
         LazyColumn(Modifier.heightIn(max=260.dp), flingBehavior=displayFling()) { items(dictionaryTargets) { target -> DisplayTextButton(enabled=dictionaryText.isNotBlank(),onClick={
             voice.pause()
-            try { repo.context.startActivity(DictionaryLookup.intent(target,dictionaryText));close() } catch(_: Exception) { error="No se pudo abrir este diccionario." }
+            try { repo.context.startActivity(DictionaryLookup.intent(target,dictionaryText));close() } catch(_: Exception) { error=tr(R.string.tr_130) }
         }) { Text(target.label) } } }
-    } },confirmButton={ DisplayTextButton(onClick=close) { Text("Cerrar") } })
+    } },confirmButton={ DisplayTextButton(onClick=close) { Text(tr(R.string.tr_115)) } })
     val export=rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/markdown")) { uri -> if(uri!=null) scope.launch {
         try { withContext(Dispatchers.IO) { repo.context.contentResolver.openOutputStream(uri,"wt")!!.use {
             it.write(notesMarkdown(store.get().let { s -> s.copy(notes=s.notes.filter { it.chapterId==saved.chapter.id }) }).toByteArray())
         } } }
         catch(e: CancellationException) { throw e }
-        catch(_: Exception) { error="No se pudieron exportar las notas." }
+        catch(_: Exception) { error=tr(R.string.tr_131) }
     } }
-    if(mode=="search") DisplayAlertDialog(onDismissRequest=close,title={ Text("Buscar en este libro") },text={ Column {
-        OutlinedTextField(query,{ query=it.take(200) },label={ Text("Texto a buscar") },singleLine=true,modifier=Modifier.fillMaxWidth().testTag("book-search-query"))
+    if(mode=="search") DisplayAlertDialog(onDismissRequest=close,title={ Text(tr(R.string.tr_132)) },text={ Column {
+        OutlinedTextField(query,{ query=it.take(200) },label={ Text(tr(R.string.tr_133)) },singleLine=true,modifier=Modifier.fillMaxWidth().testTag("book-search-query"))
         if(searching) DisplayProgress(Modifier.fillMaxWidth())
-        Text(if(query.trim().length<2) "Escribe al menos dos caracteres. Busca en todas las secciones descargadas." else "${hits.size} coincidencias"+if(hits.size==200) " · se muestran las primeras 200" else "",style=MaterialTheme.typography.bodySmall)
+        Text(if(query.trim().length<2) tr(R.string.tr_134) else tr(R.string.tr_135, hits.size)+if(hits.size==200) tr(R.string.tr_136) else "",style=MaterialTheme.typography.bodySmall)
         LazyColumn(Modifier.heightIn(max=340.dp).testTag("book-search-results"), flingBehavior=displayFling()) {
             items(hits,key={ "${it.page}:${it.block}:${it.start}" }) { hit -> DisplayTextButton(onClick={ voice.pause();close();onJump(hit.page,hit.anchor,false) }) {
-                Column(Modifier.fillMaxWidth()) { Text("Sección ${hit.page+1}",color=Green);Text(hit.excerpt) }
+                Column(Modifier.fillMaxWidth()) { Text(tr(R.string.tr_137, hit.page+1),color=Green);Text(hit.excerpt) }
             } }
         }
-    } },confirmButton={ DisplayTextButton(onClick=close) { Text("Cerrar") } })
-    if(mode=="notes") DisplayAlertDialog(onDismissRequest=close,title={ Text("Subrayados y notas") },text={ Column {
-        Text("Selecciona texto en el libro y elige «Subrayar / Nota», o usa esa acción en Herramientas.",style=MaterialTheme.typography.bodySmall)
+    } },confirmButton={ DisplayTextButton(onClick=close) { Text(tr(R.string.tr_115)) } })
+    if(mode=="notes") DisplayAlertDialog(onDismissRequest=close,title={ Text(tr(R.string.tr_138)) },text={ Column {
+        Text(tr(R.string.tr_139),style=MaterialTheme.typography.bodySmall)
         LazyColumn(Modifier.heightIn(max=360.dp).testTag("book-notes"), flingBehavior=displayFling()) {
             items(notes.sortedBy { it.page },key={ it.id }) { note -> Column(Modifier.padding(vertical=10.dp)) {
                 Text(note.quote);if(note.comment.isNotBlank()) Text(note.comment,color=Green)
                 val compatible=note.edition.sameEdition(saved.chapter)
-                Text(if(compatible) "Sección ${note.page+1}" else "Nota de otra edición",style=MaterialTheme.typography.bodySmall)
+                Text(if(compatible) tr(R.string.tr_137, note.page+1) else tr(R.string.tr_140),style=MaterialTheme.typography.bodySmall)
                 FlowRow {
-                    DisplayTextButton(enabled=compatible,onClick={ voice.pause();close();onJump(note.page,"@text:${note.block}:${note.start}:${note.end}",false) }) { Text("Ir") }
-                    DisplayTextButton(enabled=compatible,onClick={ draft=note;comment=note.comment }) { Text("Editar nota") }
-                    DisplayTextButton(onClick={ store.update { it.copy(notes=it.notes.filterNot { n -> n.id==note.id }) } }) { Text("Eliminar") }
+                    DisplayTextButton(enabled=compatible,onClick={ voice.pause();close();onJump(note.page,"@text:${note.block}:${note.start}:${note.end}",false) }) { Text(tr(R.string.tr_141)) }
+                    DisplayTextButton(enabled=compatible,onClick={ draft=note;comment=note.comment }) { Text(tr(R.string.tr_142)) }
+                    DisplayTextButton(onClick={ store.update { it.copy(notes=it.notes.filterNot { n -> n.id==note.id }) } }) { Text(tr(R.string.tr_143)) }
                 }
             } }
         }
-        DisplayOutlinedButton(enabled=notes.isNotEmpty(),onClick={ export.launch("troop-reader-notas-${saved.chapter.id}.md") }) { Text("Exportar notas") }
-    } },confirmButton={ DisplayTextButton(onClick=close) { Text("Cerrar") } })
-    if(mode=="voice") DisplayAlertDialog(onDismissRequest=close,title={ Text("Lectura en voz alta") },text={ Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
-        Text(speaker.message)
-        Text("Velocidad · %.2f×".format(speaker.rate));Slider(speaker.rate,speaker::speed,valueRange=.5f..2f)
-        Text("Temporizador")
-        FlowRow { listOf(0,15,30,60).forEach { minute -> DisplayChip(speaker.timerMinutes==minute,{ speaker.setTimer(minute) },{ Text(if(minute==0) "Sin límite" else "$minute min") }) } }
+        DisplayOutlinedButton(enabled=notes.isNotEmpty(),onClick={ export.launch("troop-reader-notas-${saved.chapter.id}.md") }) { Text(tr(R.string.tr_144)) }
+    } },confirmButton={ DisplayTextButton(onClick=close) { Text(tr(R.string.tr_115)) } })
+    if(mode=="voice") DisplayAlertDialog(onDismissRequest=close,title={ Text(tr(R.string.tr_145)) },text={ Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
+        Text(localizedStatus(speaker.message))
+        Text(tr(R.string.tr_146).format(AppLanguage.locale, speaker.rate));Slider(speaker.rate,speaker::speed,valueRange=.5f..2f)
+        Text(tr(R.string.tr_147))
+        FlowRow { listOf(0,15,30,60).forEach { minute -> DisplayChip(speaker.timerMinutes==minute,{ speaker.setTimer(minute) },{ Text(if(minute==0) tr(R.string.tr_148) else "$minute min") }) } }
         FlowRow {
             DisplayButton(enabled=speaker.available && ready,onClick={
                 if(speaker.speaking) voice.pause()
@@ -141,16 +141,16 @@ import kotlinx.serialization.json.*
                         voice.play(page,raw.toIntOrNull() ?: 0);hasStartedVoice=true
                     }
                 }
-            }) { Text(if(speaker.speaking) "Pausar" else if(hasStartedVoice) "Reanudar" else "Leer desde aquí") }
-            DisplayTextButton(enabled=speaker.available && ready,onClick={ voice.play(page);hasStartedVoice=true }) { Text("Desde el inicio de sección") }
+            }) { Text(if(speaker.speaking) tr(R.string.tr_150) else if(hasStartedVoice) tr(R.string.tr_151) else tr(R.string.tr_152)) }
+            DisplayTextButton(enabled=speaker.available && ready,onClick={ voice.play(page);hasStartedVoice=true }) { Text(tr(R.string.tr_153)) }
         }
-        Text("Usa una voz instalada sin conexión. Avanza por las secciones del libro; no lo marca como terminado. Continúa con la pantalla apagada. Usa la notificación o los auriculares para pausar. Se pausa al perder el audio o desconectar auriculares.",style=MaterialTheme.typography.bodySmall)
-        DisplayTextButton(onClick={ try { repo.context.startActivity(android.content.Intent("com.android.settings.TTS_SETTINGS").addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) } catch(_: Exception) { error="Abre Ajustes de Android → Texto a voz para instalar una voz." } }) { Text("Ajustes de voz de Android") }
-    } },confirmButton={ DisplayTextButton(onClick=close) { Text("Volver al libro") } })
-    draft?.let { n -> DisplayAlertDialog(onDismissRequest={ draft=null },title={ Text("Guardar subrayado y nota") },text={ Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
-        Text(n.quote.take(1500));OutlinedTextField(comment,{ comment=it.take(4000) },label={ Text("Nota opcional") },modifier=Modifier.fillMaxWidth().testTag("note-comment"))
-    } },confirmButton={ DisplayTextButton(onClick={ store.saveNote(n.copy(comment=comment));draft=null }) { Text("Guardar") } },dismissButton={ DisplayTextButton(onClick={ draft=null }) { Text("Cancelar") } }) }
-    error?.let { message -> DisplayAlertDialog(onDismissRequest={ error=null },title={ Text("Herramientas del libro") },text={ Text(message) },confirmButton={ DisplayTextButton(onClick={ error=null }) { Text("Aceptar") } }) }
+        Text(tr(R.string.tr_154),style=MaterialTheme.typography.bodySmall)
+        DisplayTextButton(onClick={ try { repo.context.startActivity(android.content.Intent("com.android.settings.TTS_SETTINGS").addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) } catch(_: Exception) { error=tr(R.string.tr_155) } }) { Text(tr(R.string.tr_156)) }
+    } },confirmButton={ DisplayTextButton(onClick=close) { Text(tr(R.string.tr_157)) } })
+    draft?.let { n -> DisplayAlertDialog(onDismissRequest={ draft=null },title={ Text(tr(R.string.tr_158)) },text={ Column(Modifier.verticalScroll(rememberScrollState(), flingBehavior=displayFling())) {
+        Text(n.quote.take(1500));OutlinedTextField(comment,{ comment=it.take(4000) },label={ Text(tr(R.string.tr_159)) },modifier=Modifier.fillMaxWidth().testTag("note-comment"))
+    } },confirmButton={ DisplayTextButton(onClick={ store.saveNote(n.copy(comment=comment));draft=null }) { Text(tr(R.string.tr_160)) } },dismissButton={ DisplayTextButton(onClick={ draft=null }) { Text(tr(R.string.tr_161)) } }) }
+    error?.let { message -> DisplayAlertDialog(onDismissRequest={ error=null },title={ Text(tr(R.string.tr_162)) },text={ Text(message) },confirmButton={ DisplayTextButton(onClick={ error=null }) { Text(tr(R.string.tr_163)) } }) }
 }
 
 @Composable fun ReaderStatistics(store: Store, chapterId: Int, page: Int, active: Boolean) {

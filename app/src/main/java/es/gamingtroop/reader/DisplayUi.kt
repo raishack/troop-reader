@@ -124,42 +124,42 @@ import androidx.compose.ui.window.DialogWindowProvider
     val prefs=LocalDisplayPreferences.current ?: return
     val refresh=LocalEinkRefresh.current
     Column(Modifier.fillMaxWidth()) {
-        Text("Tipo de pantalla",style=MaterialTheme.typography.titleMedium)
+        Text(tr(R.string.tr_092),style=MaterialTheme.typography.titleMedium)
         DisplayMode.entries.forEach { mode ->
             DisplayChip(prefs.mode==mode,{ prefs.mode(mode) },{ Text(mode.label) },modifier=Modifier.fillMaxWidth())
         }
         if(prefs.mode.eink) {
-            Text("Texto negro, fondo blanco y controles estáticos. Hoja y lectura continua quedan suspendidos, sin borrar tus ajustes.",style=MaterialTheme.typography.bodySmall)
+            Text(tr(R.string.tr_093),style=MaterialTheme.typography.bodySmall)
             Row(verticalAlignment=Alignment.CenterVertically) {
-                Text("Limpiar al navegar",Modifier.weight(1f));DisplaySwitch(prefs.cleaning,prefs::cleaning)
+                Text(tr(R.string.tr_094),Modifier.weight(1f));DisplaySwitch(prefs.cleaning,prefs::cleaning)
             }
             if(refresh?.bigmeStatus==BigmeApiStatus.AVAILABLE) {
                 Row(verticalAlignment=Alignment.CenterVertically) {
-                    Text("Refresco Bigme experimental",Modifier.weight(1f))
-                    DisplaySwitch(prefs.bigmeNative,prefs::bigmeNative,Modifier.semantics { contentDescription="Refresco Bigme experimental" })
+                    Text(tr(R.string.tr_095),Modifier.weight(1f))
+                    DisplaySwitch(prefs.bigmeNative,prefs::bigmeNative,Modifier.semantics { contentDescription=tr(R.string.tr_095) })
                 }
-                Text("Solicita limpieza al controlador Bigme. Actívalo y prueba «Limpiar pantalla ahora». Desactívalo si no mejora. Se desactiva tras cambiar el firmware.",style=MaterialTheme.typography.bodySmall)
+                Text(tr(R.string.tr_096),style=MaterialTheme.typography.bodySmall)
             }
             Text(if(prefs.bigmeNative && refresh?.bigmeStatus==BigmeApiStatus.AVAILABLE)
-                "Refresco Bigme solicitado al navegar; pendiente de comprobar en tu pantalla."
-            else if(refresh?.driverAvailable==true) "Controlador BOOX detectado; falta comprobar el refresco en el panel." else
-                "Repintado compatible. Activa también el refresco completo en los ajustes del lector.",style=MaterialTheme.typography.bodySmall)
+                tr(R.string.tr_097)
+            else if(refresh?.driverAvailable==true) tr(R.string.tr_098) else
+                tr(R.string.tr_099),style=MaterialTheme.typography.bodySmall)
             if(refresh?.bigmeStatus==BigmeApiStatus.FAILED) Text(BigmeApiStatus.FAILED.label,style=MaterialTheme.typography.bodySmall)
-            OutlinedButton(onClick={ refresh?.request() },enabled=prefs.cleaning) { Text("Limpiar pantalla ahora") }
+            OutlinedButton(onClick={ refresh?.request() },enabled=prefs.cleaning) { Text(tr(R.string.tr_100)) }
             var help by remember { mutableStateOf(false) }
-            TextButton(onClick={ help=true }) { Text("Compatibilidad y refresco") }
-            if(help) DisplayAlertDialog(onDismissRequest={ help=false },title={ Text("Refresco de tinta electrónica") },
+            TextButton(onClick={ help=true }) { Text(tr(R.string.tr_101)) }
+            if(help) DisplayAlertDialog(onDismissRequest={ help=false },title={ Text(tr(R.string.tr_102)) },
                 text={ Column(Modifier.verticalScroll(rememberScrollState(),flingBehavior=displayFling())) {
-                    Text("La limpieza produce un destello deliberado y añade espera. Se realiza al terminar cada navegación o desplazamiento, no durante el gesto. Puedes desactivarla sin quitar el tema.")
-                    Text(refresh?.bigmeStatus?.label ?: "Controlador no disponible")
+                    Text(tr(R.string.tr_103))
+                    Text(refresh?.bigmeStatus?.label ?: tr(R.string.tr_104))
                     Text(if(prefs.bigmeNative && refresh?.bigmeStatus==BigmeApiStatus.AVAILABLE)
-                        "Se usa la orden de limpieza global Bigme con el modo indicado por su firmware. La API está documentada por la comunidad en otro Bigme; no se ha validado aún en B751C S con sistema 1.7.0. Que acepte la orden no prueba que elimine el ghosting."
-                    else if(refresh?.driverAvailable==true) "Se solicitará refresco completo al controlador BOOX. El resultado depende del firmware y debe comprobarse en el lector." else
-                        "No está activo un controlador nativo compatible. Se repinta toda la ventana con un ciclo negro/blanco; no garantiza un refresco físico. Activa también el refresco completo por página en los ajustes de tu lector.")
-                    Text("Puedes exportar el estado de detección desde Mi espacio → Diagnóstico. No incluye número de serie ni datos de la cuenta.")
-                    Text("Usa Calidad/Normal para texto e imágenes; A2/Rápido puede dejar más residuos. La app no controla el teclado ni los diálogos de Android. No cambia brillo ni ajustes globales.")
-                    if(prefs.mode==DisplayMode.COLOR) Text("Se conservan los colores originales. Resolución, contraste y tiempos de refresco dependen del panel; no todos los dispositivos de color usan el mismo controlador.")
-                } },confirmButton={ TextButton(onClick={ help=false }) { Text("Entendido") } })
+                        tr(R.string.tr_105)
+                    else if(refresh?.driverAvailable==true) tr(R.string.tr_106) else
+                        tr(R.string.tr_107))
+                    Text(tr(R.string.tr_108))
+                    Text(tr(R.string.tr_109))
+                    if(prefs.mode==DisplayMode.COLOR) Text(tr(R.string.tr_110))
+                } },confirmButton={ TextButton(onClick={ help=false }) { Text(tr(R.string.tr_111)) } })
         }
     }
 }
@@ -169,7 +169,7 @@ import androidx.compose.ui.window.DialogWindowProvider
     if(!LocalDisplayMode.current.eink) { Switch(checked,onCheckedChange,modifier,enabled=enabled);return }
     Box(modifier.sizeIn(minWidth=64.dp,minHeight=48.dp).padding(4.dp).border(2.dp,Color.Black,RoundedCornerShape(4.dp))
         .toggleable(checked,enabled=enabled,role=Role.Switch,onValueChange={ onCheckedChange?.invoke(it);refresh?.request() }),contentAlignment=Alignment.Center) {
-        Text(if(checked) "Sí ✓" else "No",color=Color.Black,fontWeight=if(checked) FontWeight.Bold else FontWeight.Normal)
+        Text(if(checked) tr(R.string.tr_112) else tr(R.string.tr_113),color=Color.Black,fontWeight=if(checked) FontWeight.Bold else FontWeight.Normal)
     }
 }
 @Composable fun DisplayCheckbox(checked: Boolean,onCheckedChange: ((Boolean)->Unit)?,modifier: Modifier=Modifier,enabled: Boolean=true) {
@@ -229,7 +229,7 @@ import androidx.compose.ui.window.DialogWindowProvider
         Surface(Modifier.fillMaxSize(),color=Color.White) {
             Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
                 Column(Modifier.weight(1f)) { content() }
-                TextButton(onClick=onDismissRequest,modifier=Modifier.align(Alignment.End)) { Text("Cerrar") }
+                TextButton(onClick=onDismissRequest,modifier=Modifier.align(Alignment.End)) { Text(tr(R.string.tr_115)) }
             }
         }
     }
@@ -254,7 +254,7 @@ import androidx.compose.ui.window.DialogWindowProvider
     } }
 @Composable fun DisplayDropdownMenu(expanded: Boolean,onDismissRequest: ()->Unit,content: @Composable ColumnScope.()->Unit) {
     if(!LocalDisplayMode.current.eink) DropdownMenu(expanded,onDismissRequest,content=content)
-    else if(expanded) DisplayAlertDialog(onDismissRequest,confirmButton={ TextButton(onClick=onDismissRequest) { Text("Cerrar") } },text={ Column { content() } })
+    else if(expanded) DisplayAlertDialog(onDismissRequest,confirmButton={ TextButton(onClick=onDismissRequest) { Text(tr(R.string.tr_115)) } },text={ Column { content() } })
 }
 
 // Explicit action hooks also cover TalkBack/keyboard/semantic activation, not just touch.

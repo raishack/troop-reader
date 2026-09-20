@@ -37,7 +37,7 @@ object UpdatePolicy {
     private val json = Json { ignoreUnknownKeys = true }
     fun parse(text: String): AppRelease = json.decodeFromString<AppRelease>(text).also(::validate)
     fun validate(release: AppRelease) {
-        require(release.schemaVersion == 1) { "Catálogo de actualizaciones no compatible" }
+        require(release.schemaVersion == 1) { tr(R.string.tr_560) }
         require(release.packageName == BuildConfig.APPLICATION_ID && release.versionCode > 0)
         require(release.versionName.matches(Regex("[0-9A-Za-z.+_-]{1,64}")))
         require(release.minSdk in 26..1000 && release.sizeBytes in 1..MAX_APK_BYTES)
@@ -57,7 +57,7 @@ object UpdatePolicy {
     }
     fun verifyBytes(file: File, release: AppRelease) {
         require(file.length() == release.sizeBytes && hash(file) == release.sha256) {
-            "La actualización está incompleta o no coincide con la publicada. Vuelve a descargarla."
+            tr(R.string.tr_561)
         }
     }
 }
@@ -70,10 +70,10 @@ class UpdateFeed(
 ) {
     private fun response(url: HttpUrl) = client.newCall(Request.Builder().url(url)
         .header("Cache-Control", "no-cache").build()).execute().also {
-        if (it.code != 200) { it.close(); throw IOException("El servidor de actualizaciones no está disponible") }
+        if (it.code != 200) { it.close(); throw IOException(tr(R.string.tr_562)) }
     }
     fun latest(): AppRelease = response(feedUrl).use { response ->
-        val body = response.body ?: throw IOException("Catálogo vacío")
+        val body = response.body ?: throw IOException(tr(R.string.tr_563))
         require(body.contentLength() <= UpdatePolicy.MAX_FEED_BYTES)
         val bytes = body.byteStream().use { input ->
             val output = java.io.ByteArrayOutputStream()
@@ -94,7 +94,7 @@ class UpdateFeed(
         try {
             target.parentFile!!.mkdirs()
             response(release.apkUrl.toHttpUrl()).use { response ->
-                val body = response.body ?: throw IOException("Descarga vacía")
+                val body = response.body ?: throw IOException(tr(R.string.tr_564))
                 require(body.contentLength() == -1L || body.contentLength() == release.sizeBytes)
                 body.byteStream().use { input -> part.outputStream().use { output ->
                     val buffer = ByteArray(64 * 1024); var bytes = 0L; var lastPercent = -1
@@ -102,7 +102,7 @@ class UpdateFeed(
                         active()
                         val count = input.read(buffer); if (count < 0) break
                         bytes += count
-                        require(bytes <= release.sizeBytes) { "La descarga supera el tamaño publicado" }
+                        require(bytes <= release.sizeBytes) { tr(R.string.tr_565) }
                         output.write(buffer, 0, count)
                         val percent = (100 * bytes / release.sizeBytes).toInt()
                         if (percent != lastPercent) { lastPercent = percent; progress(percent) }
@@ -111,7 +111,7 @@ class UpdateFeed(
                 } }
             }
             active(); UpdatePolicy.verifyBytes(part, release)
-            check(part.renameTo(target)) { "No se pudo guardar la actualización" }
+            check(part.renameTo(target)) { tr(R.string.tr_566) }
         } finally { part.delete() }
     }
 }

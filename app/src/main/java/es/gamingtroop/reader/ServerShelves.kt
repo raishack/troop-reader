@@ -54,22 +54,22 @@ object Shelves {
     var selected by remember { mutableStateOf<ServerShelf?>(null) };var collections by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) };var error by remember { mutableStateOf<String?>(null) }
     val scope=rememberCoroutineScope()
-    fun operation(block: suspend ()->Unit) { scope.launch { busy=true;error=null;try { block() } catch(e: CancellationException) { throw e } catch(_: Exception) { error="No se pudo consultar Kavita. Se conserva la última copia disponible." } finally { busy=false } } }
+    fun operation(block: suspend ()->Unit) { scope.launch { busy=true;error=null;try { block() } catch(e: CancellationException) { throw e } catch(_: Exception) { error=tr(R.string.tr_552) } finally { busy=false } } }
     LaunchedEffect(Unit) { if(state.serverShelves.checkedAt==0L && account.server!="https://demo.invalid") operation { Shelves.refresh(repo,account.key) } }
     Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
-        Text("Listas y colecciones de Kavita",style=MaterialTheme.typography.titleLarge)
-        Text("Consulta del servidor y copia offline de lo que abras. No modifica tus listas online ni las colecciones personales.")
-        Row { DisplayChip(!collections,{ selected=null;collections=false },{ Text("Listas") });Spacer(Modifier.width(8.dp));DisplayChip(collections,{ selected=null;collections=true },{ Text("Colecciones") }) }
-        DisplayOutlinedButton(enabled=!busy,onClick={ operation { Shelves.refresh(repo,account.key);selected?.let { Shelves.load(repo,account.key,it.id,collections) } } }) { Text("Actualizar desde Kavita") }
+        Text(tr(R.string.tr_553),style=MaterialTheme.typography.titleLarge)
+        Text(tr(R.string.tr_554))
+        Row { DisplayChip(!collections,{ selected=null;collections=false },{ Text(tr(R.string.tr_555)) });Spacer(Modifier.width(8.dp));DisplayChip(collections,{ selected=null;collections=true },{ Text(tr(R.string.tr_345)) }) }
+        DisplayOutlinedButton(enabled=!busy,onClick={ operation { Shelves.refresh(repo,account.key);selected?.let { Shelves.load(repo,account.key,it.id,collections) } } }) { Text(tr(R.string.tr_556)) }
         if(busy) DisplayProgress(Modifier.fillMaxWidth())
         error?.let { Text(it,color=MaterialTheme.colorScheme.error) }
         val shelf=selected
         if(shelf==null) {
             val list=if(collections) state.serverShelves.collections else state.serverShelves.lists
-            if(list.isEmpty() && !busy) Text("No hay listas disponibles en la copia actual.")
+            if(list.isEmpty() && !busy) Text(tr(R.string.tr_557))
             LazyColumn(Modifier.heightIn(max=420.dp), flingBehavior=displayFling()) { items(list,key={ it.id }) { item -> DisplayTextButton(onClick={ selected=item;operation { Shelves.load(repo,account.key,item.id,collections) } }) { Text(item.label) } } }
         } else {
-            DisplayTextButton(onClick={ selected=null }) { Text("Volver a las listas") };Text(shelf.label)
+            DisplayTextButton(onClick={ selected=null }) { Text(tr(R.string.tr_558)) };Text(shelf.label)
             LazyColumn(Modifier.heightIn(max=420.dp), flingBehavior=displayFling()) {
                 if(collections) items(state.serverShelves.members[shelf.id].orEmpty(),key={ it.id }) { s -> DisplayTextButton(onClick={ open(s) }) { Text(s.name) } }
                 else items(state.serverShelves.items[shelf.id].orEmpty(),key={ it.id }) { item -> DisplayTextButton(onClick={ open(item.series()) }) {

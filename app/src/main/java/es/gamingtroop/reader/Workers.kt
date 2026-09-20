@@ -19,7 +19,8 @@ class ReaderApp: Application() {
     companion object { var updateAutomationEnabled = true }
     override fun onCreate() {
         super.onCreate()
-        getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel("downloads", "Descargas de lectura", NotificationManager.IMPORTANCE_LOW))
+        AppLanguage.initialize(this)
+        getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel("downloads", tr(R.string.tr_597), NotificationManager.IMPORTANCE_LOW))
         repository.active()?.let { Jobs.scheduleSync(this, it.key); DiscoveryJobs.schedule(this,it.key) }
         if(updateAutomationEnabled) updates.initialize()
     }
@@ -49,7 +50,7 @@ object Jobs {
             .setInputData(workDataOf("account" to key, "chapter" to id)).addTag(key).addTag(downloadTag(key,id)).build()
         store.update { state -> state.copy(chapters = state.chapters.mapValues { (k,v) ->
             if(k == id) v.copy(downloadRequested = true, downloadRequestId = request.id.toString(),
-                state = if(wifi) "Esperando Wi‑Fi" else "En cola") else v }) }
+                state = if(wifi) tr(R.string.tr_598) else tr(R.string.tr_599)) else v }) }
         // REPLACE is essential: KEEP silently keeps the old Wi-Fi constraint/backoff.
         WorkManager.getInstance(context).enqueueUniqueWork(downloadTag(key,id),ExistingWorkPolicy.REPLACE,request).result.get()
     }
@@ -86,7 +87,7 @@ object Jobs {
             // Invalidate the ENTIRE selection first, before waiting for any writer.
             store.update { s -> s.copy(chapters = s.chapters.mapValues { (k,v) ->
                 if(k in selected) v.copy(downloadRequested = false, downloadRequestId = "paused",
-                    state = "Descarga pausada. Puedes reanudarla.") else v }) }
+                    state = tr(R.string.tr_600)) else v }) }
             for(id in selected) WorkManager.getInstance(context).cancelUniqueWork(downloadTag(key,id)).result.get()
             for(id in selected) repo.payloadLock(key,id).withLock { /* Retain resumable pages. */ }
         }
@@ -119,9 +120,9 @@ class SyncWorker(context: Context, params: WorkerParameters): CoroutineWorker(co
 class DownloadWorker(context: Context, params: WorkerParameters): CoroutineWorker(context, params) {
     private fun foreground(title: String, page: Int, count: Int): ForegroundInfo {
         val notification = NotificationCompat.Builder(applicationContext, "downloads").setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle(title).setContentText("Guardando para leer sin conexión · $page/$count")
+            .setContentTitle(title).setContentText(tr(R.string.tr_601, page, count))
             .setProgress(count, page, count == 0).setOngoing(true)
-            .addAction(android.R.drawable.ic_delete, "Cancelar", WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)).build()
+            .addAction(android.R.drawable.ic_delete, tr(R.string.tr_161), WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)).build()
         return if (android.os.Build.VERSION.SDK_INT >= 29) ForegroundInfo(id.hashCode(), notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
         else ForegroundInfo(id.hashCode(), notification)
     }
@@ -140,20 +141,20 @@ class DownloadWorker(context: Context, params: WorkerParameters): CoroutineWorke
             repo.transferLock.withLock { repo.payloadLock(key, chapterId).withLock payload@{
                 val saved = store.get().chapters[chapterId] ?: return@payload Result.failure()
                 if (saved.ready || !owns(saved) || saved.downloadRequested == false) return@payload Result.success()
-                check(repo.active()?.canDownload == true) { "Tu usuario necesita permiso de descarga" }
+                check(repo.active()?.canDownload == true) { tr(R.string.tr_602) }
                 val api = repo.api(key)
                 // Ask Download API too: do not use reading endpoints to bypass server download permissions.
                 runInterruptible { api.response("api/Download/chapter-size?chapterId=$chapterId").close() }
                 val current = runInterruptible { api.get<Chapter>("api/Series/chapter?chapterId=$chapterId") }
-                require(saved.chapter.sameEdition(current)) { "El archivo cambió. Elimina la descarga parcial y vuelve a seleccionarlo." }
-                require(saved.chapter.pages in 1..20000) { "Número de páginas no compatible" }
+                require(saved.chapter.sameEdition(current)) { tr(R.string.tr_603) }
+                require(saved.chapter.pages in 1..20000) { tr(R.string.tr_604) }
                 val dir = store.chapterDir(chapterId).apply { mkdirs() }
                 fun allowance(): Long {
                     if(!saved.automatic) return 100L * 1024 * 1024
                     val policy = store.get().smartDownloads
-                    check(policy.enabled) { "Descarga automática desactivada" }
+                    check(policy.enabled) { tr(R.string.tr_605) }
                     val available = policy.limitMiB * 1024L * 1024 - automaticBytes(store)
-                    check(available > 0) { "Límite de descargas automáticas alcanzado. Puedes ampliar el límite o descargar manualmente." }
+                    check(available > 0) { tr(R.string.tr_606) }
                     return available.coerceAtMost(100L * 1024 * 1024)
                 }
                 val bundle = OfflineHtml(repo.active()!!.server, chapterId, dir) { path, file -> api.download(path, file, maxBytes = allowance()); Unit }
@@ -163,7 +164,7 @@ class DownloadWorker(context: Context, params: WorkerParameters): CoroutineWorke
                 var lastNotification = 0L
                 for (page in 0 until saved.chapter.pages) {
                     ensureActive()
-                    check(repo.active()?.key == key) { "La sesión cambió" }
+                    check(repo.active()?.key == key) { tr(R.string.tr_607) }
                     if(store.get().chapters[chapterId]?.let { !owns(it) || it.downloadRequested == false } != false) return@payload Result.success()
                     val file = File(dir, if (saved.epub) "$page.html" else "$page.img")
                     val previousBytes = file.length()
@@ -172,7 +173,7 @@ class DownloadWorker(context: Context, params: WorkerParameters): CoroutineWorke
                             val raw = api.text("api/Book/$chapterId/book-page?page=$page")
                             val html = if (raw.trimStart().startsWith('"')) codec.decodeFromString<String>(raw) else raw
                             val safe = bundle.sanitize(html)
-                            val partial = File(dir, "$page.html.part"); check(safe.toByteArray().size <= allowance()) { "Límite de descargas automáticas alcanzado" }; partial.writeText(safe); check(partial.renameTo(file))
+                            val partial = File(dir, "$page.html.part"); check(safe.toByteArray().size <= allowance()) { tr(R.string.tr_608) }; partial.writeText(safe); check(partial.renameTo(file))
                         } else api.download("api/Reader/image?chapterId=$chapterId&page=$page&extractPdf=true", file, maxBytes = allowance())
                     }
                     if (!saved.epub) {
@@ -180,11 +181,11 @@ class DownloadWorker(context: Context, params: WorkerParameters): CoroutineWorke
                         android.graphics.BitmapFactory.decodeFile(file.path, bounds)
                         if (bounds.outWidth <= 0 || bounds.outHeight <= 0) {
                             file.delete()
-                            error("Kavita no entregó una imagen válida. Reintenta la descarga.")
+                            error(tr(R.string.tr_609))
                         }
                     }
                     bytes += file.length() - previousBytes
-                    updateBook { it.copy(totalBytes = bytes, downloadedPages = maxOf(it.downloadedPages, page + 1), state = "Descargando ${page+1}/${saved.chapter.pages}") }
+                    updateBook { it.copy(totalBytes = bytes, downloadedPages = maxOf(it.downloadedPages, page + 1), state = tr(R.string.tr_610, page+1, saved.chapter.pages)) }
                     val now = android.os.SystemClock.elapsedRealtime()
                     if(now - lastNotification >= 1000 || page + 1 == saved.chapter.pages) {
                         setForeground(foreground(saved.series.name, page + 1, saved.chapter.pages)); lastNotification = now
@@ -196,12 +197,12 @@ class DownloadWorker(context: Context, params: WorkerParameters): CoroutineWorke
                 if(saved.chapter.volumeId > 0) repo.ensureCover(key, CoverRef("volume",saved.chapter.volumeId))
                 ensureActive()
                 bytes = dir.walkTopDown().filter { it.isFile }.sumOf { it.length() }
-                updateBook { it.copy(ready = true, downloadRequested = false, totalBytes = bytes, toc = toc, state = "Disponible sin conexión") }
+                updateBook { it.copy(ready = true, downloadRequested = false, totalBytes = bytes, toc = toc, state = tr(R.string.tr_189)) }
                 Result.success()
             } }
-        } catch (e: CancellationException) { state(if(store.get().settings.wifiOnly) "Esperando Wi‑Fi" else "Esperando conexión"); throw e }
+        } catch (e: CancellationException) { state(if(store.get().settings.wifiOnly) tr(R.string.tr_598) else tr(R.string.tr_611)); throw e }
         catch (e: Exception) {
-            state(when(e) { is ApiError -> e.message.orEmpty(); is IllegalArgumentException, is IllegalStateException -> e.message.orEmpty(); else -> "Descarga interrumpida. Comprueba la conexión y reintenta." })
+            state(when(e) { is ApiError -> e.message.orEmpty(); is IllegalArgumentException, is IllegalStateException -> e.message.orEmpty(); else -> tr(R.string.tr_612) })
             if (e is ApiError && e.status in listOf(400,401,403,404) || e is IllegalArgumentException || e is IllegalStateException) Result.failure() else Result.retry()
         }
     }

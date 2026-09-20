@@ -46,7 +46,7 @@ class AppUpdates(private val context: Context, internal val feed: UpdateFeed = U
     }
     fun initialize() {
         context.getSystemService(NotificationManager::class.java).createNotificationChannel(
-            NotificationChannel("app-updates", "Actualizaciones de la app", NotificationManager.IMPORTANCE_DEFAULT))
+            NotificationChannel("app-updates", tr(R.string.tr_022), NotificationManager.IMPORTANCE_DEFAULT))
         if (mutable.value.release == null) {
             // Only updater-owned packages; never touches reading accounts or downloads.
             folder.listFiles()?.filter { it.name.matches(Regex("update-.*\\.apk(\\.part)?")) }?.forEach { it.delete() }
@@ -86,7 +86,7 @@ class AppUpdates(private val context: Context, internal val feed: UpdateFeed = U
                 notifyUpdate()
             } else context.getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
         } catch (e: CancellationException) { throw e }
-        catch (e: Exception) { change { it.copy(error = "No se pudo comprobar la nueva versión. Comprueba la conexión y vuelve a intentarlo.") }; throw e }
+        catch (e: Exception) { change { it.copy(error = tr(R.string.tr_023)) }; throw e }
         finally { change { it.copy(checking = false) } }
     }
     fun autoDownload(enabled: Boolean) {
@@ -116,7 +116,7 @@ class AppUpdates(private val context: Context, internal val feed: UpdateFeed = U
                 val job = currentCoroutineContext()
                 fun active() {
                     job.ensureActive()
-                    if (!release.samePackage(mutable.value.release)) throw CancellationException("Actualización sustituida")
+                    if (!release.samePackage(mutable.value.release)) throw CancellationException(tr(R.string.tr_024))
                 }
                 runInterruptible {
                     active()
@@ -124,7 +124,7 @@ class AppUpdates(private val context: Context, internal val feed: UpdateFeed = U
                     // saving "ready", and avoid re-downloading on duplicate workers.
                     val reusable = target.isFile && runCatching { verifyApk(target, release) }.isSuccess
                     if (!reusable) {
-                        check(folder.apply { mkdirs() }.usableSpace > release.sizeBytes + 8 * 1024 * 1024) { "No hay espacio suficiente para la actualización" }
+                        check(folder.apply { mkdirs() }.usableSpace > release.sizeBytes + 8 * 1024 * 1024) { tr(R.string.tr_025) }
                         feed.download(release, target, ::active) { percent -> changeFor(release) { it.copy(percent = percent) } }
                         verifyApk(target, release)
                     }
@@ -146,7 +146,7 @@ class AppUpdates(private val context: Context, internal val feed: UpdateFeed = U
             changeFor(release) {
                 prefs.edit().remove("ready").apply()
                 it.copy(ready = false, error = if(e is IllegalArgumentException || e is IllegalStateException) e.message
-                    else "Descarga interrumpida. Puedes reintentar; tus lecturas siguen intactas.")
+                    else tr(R.string.tr_026))
             }
             throw e
         } finally { changeFor(release) { it.copy(downloading = false) } }
@@ -157,30 +157,30 @@ class AppUpdates(private val context: Context, internal val feed: UpdateFeed = U
         require(release.versionCode > BuildConfig.VERSION_CODE && release.minSdk <= Build.VERSION.SDK_INT)
         val flags = if(Build.VERSION.SDK_INT >= 28) PackageManager.GET_SIGNING_CERTIFICATES else PackageManager.GET_SIGNATURES
         val incoming = context.packageManager.getPackageArchiveInfo(file.path, flags)
-            ?: error("El archivo no es una APK válida")
+            ?: error(tr(R.string.tr_027))
         val installed = context.packageManager.getPackageInfo(context.packageName, flags)
         val version = if(Build.VERSION.SDK_INT >= 28) incoming.longVersionCode else incoming.versionCode.toLong()
         require(incoming.packageName == context.packageName && version == release.versionCode.toLong() && incoming.versionName == release.versionName) {
-            "La APK no corresponde a la actualización publicada"
+            tr(R.string.tr_028)
         }
-        require((incoming.applicationInfo?.minSdkVersion ?: Int.MAX_VALUE) <= Build.VERSION.SDK_INT) { "Esta versión requiere un Android más reciente" }
+        require((incoming.applicationInfo?.minSdkVersion ?: Int.MAX_VALUE) <= Build.VERSION.SDK_INT) { tr(R.string.tr_029) }
         fun signers(info: PackageInfo): Set<String> = (if(Build.VERSION.SDK_INT >= 28) info.signingInfo?.apkContentsSigners else info.signatures)
             .orEmpty().map { it.toCharsString() }.toSet()
         val signatures = signers(installed)
-        require(signatures.isNotEmpty() && signatures == signers(incoming)) { "La firma de esta APK no coincide con la app instalada" }
+        require(signatures.isNotEmpty() && signatures == signers(incoming)) { tr(R.string.tr_030) }
     }
     suspend fun installerIntent(): Intent = withContext(Dispatchers.IO) {
-        val release = mutable.value.release ?: error("No hay una actualización disponible")
+        val release = mutable.value.release ?: error(tr(R.string.tr_031))
         val file = file(release)
         try { verifyApk(file, release) }
         catch (e: Exception) {
             changeFor(release) {
                 prefs.edit().remove("ready").apply()
-                it.copy(ready = false, error = "La APK ya no está disponible o no es válida. Vuelve a descargarla.")
+                it.copy(ready = false, error = tr(R.string.tr_032))
             }
             throw e
         }
-        check(release.samePackage(mutable.value.release)) { "Hay una actualización más reciente. Vuelve a abrir el instalador." }
+        check(release.samePackage(mutable.value.release)) { tr(R.string.tr_033) }
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.updates", file)
         Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -193,7 +193,7 @@ class AppUpdates(private val context: Context, internal val feed: UpdateFeed = U
         val pending = PendingIntent.getActivity(context, 1500, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(context, "app-updates").setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setContentTitle("Troop Reader ${release.versionName}")
-            .setContentText(if(state.ready) "Actualización lista · toca para instalar" else "Nueva versión disponible")
+            .setContentText(if(state.ready) tr(R.string.tr_035) else tr(R.string.tr_036))
             .setContentIntent(pending).setAutoCancel(true).setOnlyAlertOnce(true).build()
         try { context.getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification) }
         catch (_: SecurityException) { /* Still visible inside the app without notification permission. */ }

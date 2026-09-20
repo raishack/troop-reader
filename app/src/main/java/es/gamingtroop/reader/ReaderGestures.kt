@@ -40,8 +40,8 @@ class ReaderWebView(context: android.content.Context): WebView(context) {
             }
             override fun onCreateActionMode(mode: android.view.ActionMode, menu: android.view.Menu): Boolean {
                 val result=callback.onCreateActionMode(mode,menu)
-                if(result) { menu.add(0,17001,0,"Subrayar / Nota").setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                    menu.add(0,17002,1,"Diccionario").setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM) }
+                if(result) { menu.add(0,17001,0,tr(R.string.tr_403)).setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                    menu.add(0,17002,1,tr(R.string.tr_126)).setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM) }
                 if(eink) post { onSettled?.invoke() }
                 return result
             }

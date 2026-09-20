@@ -33,7 +33,7 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
             val batch = kotlinx.coroutines.runInterruptible { codec.decodeFromString<List<Series>>(api.text("api/Series/all-v2?pageNumber=$page&pageSize=100", "{}")) }
             all += batch
             if (batch.size < 100) break
-            require(++page <= 1000) { "Biblioteca demasiado grande para esta versión" }
+            require(++page <= 1000) { tr(R.string.tr_536) }
         }
         kotlin.coroutines.coroutineContext.ensureActive()
         store.update { it.copy(libraries = libs, series = all) }
@@ -47,7 +47,7 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
     suspend fun prepareBatch(key: String, series: Series, chapters: List<Chapter>,
         enqueue: suspend (Int) -> Unit): BatchResult {
         val unique = chapters.distinctBy { it.id }
-        require(unique.size in 1..20000) { "Selecciona entre 1 y 20.000 unidades de lectura por lote" }
+        require(unique.size in 1..20000) { tr(R.string.tr_537) }
         var queued = 0; var skipped = 0
         val errors = linkedMapOf<Int, String>()
         for (chapter in unique) {
@@ -58,21 +58,21 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
             catch (e: kotlinx.coroutines.CancellationException) { throw e }
             catch (e: Exception) {
                 errors[chapter.id] = if (e is ApiError || e is IllegalArgumentException || e is IllegalStateException)
-                    e.message.orEmpty() else "No se pudo preparar esta descarga. Comprueba la conexión."
+                    e.message.orEmpty() else tr(R.string.tr_538)
                 if (e is ApiError && e.status == 401) break
             }
         }
         return BatchResult(queued, skipped, errors)
     }
     suspend fun prepare(key: String, series: Series, chapter: Chapter) = payloadLock(key, chapter.id).withLock { withContext(Dispatchers.IO) {
-        val account = active()?.takeIf { it.key == key } ?: error("Inicia sesión")
-        check(account.canDownload) { "Activa el permiso Download de tu usuario en Kavita" }
-        require(chapter.pages in 1..20000) { "Esta lectura no tiene páginas compatibles" }
+        val account = active()?.takeIf { it.key == key } ?: error(tr(R.string.tr_539))
+        check(account.canDownload) { tr(R.string.tr_540) }
+        require(chapter.pages in 1..20000) { tr(R.string.tr_541) }
         val store = store(key)
         val old = store.get().chapters[chapter.id]
         if (old != null && !old.chapter.sameEdition(chapter)) {
-            check(!store.get().pending.containsKey(chapter.id)) { "La edición cambió y tienes progreso pendiente. Resuélvelo antes de descargar la nueva edición." }
-            check(!readers.contains("$key:${chapter.id}")) { "Cierra esta lectura antes de cambiar de edición" }
+            check(!store.get().pending.containsKey(chapter.id)) { tr(R.string.tr_542) }
+            check(!readers.contains("$key:${chapter.id}")) { tr(R.string.tr_543) }
         }
         val progress = kotlinx.coroutines.runInterruptible { api(key).remoteProgress(chapter.id) }
         // Preserve the original download if refreshing from the server fails.
@@ -95,7 +95,7 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
                     val saved = store.get().chapters[id] ?: continue
                     val currentChapter = cancellableApiCall { api.get<Chapter>("api/Series/chapter?chapterId=$id") }
                     if (!saved.chapter.sameEdition(currentChapter)) {
-                        store.update { s -> s.copy(pending = s.pending.mapValues { (k,v) -> if (k == id) v.copy(error = "El archivo cambió en el servidor. Revisa la edición antes de sincronizar.") else v }) }
+                        store.update { s -> s.copy(pending = s.pending.mapValues { (k,v) -> if (k == id) v.copy(error = tr(R.string.tr_544)) else v }) }
                         continue
                     }
                     val remote = cancellableApiCall { api.remoteProgress(id) }
@@ -107,7 +107,7 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
                             if (store.get().pending[id]?.revision != pending.revision) continue
                             cancellableApiCall { api.save(pending.local) }
                             val confirmed = cancellableApiCall { api.remoteProgress(id) }
-                            if (!confirmed.samePosition(pending.local)) throw IllegalStateException("Kavita no confirmó la posición enviada")
+                            if (!confirmed.samePosition(pending.local)) throw IllegalStateException(tr(R.string.tr_545))
                             store.update { SyncPolicy.acknowledge(it, id, pending.revision, confirmed) }
                         }
                     }
@@ -125,7 +125,7 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
                 try {
                     val current = cancellableApiCall { api.get<Chapter>("api/Series/chapter?chapterId=$id") }
                     if (!saved.chapter.sameEdition(current)) {
-                        store.update { it.copy(syncIssues = it.syncIssues + (id to "El archivo cambió en Kavita. La copia offline conserva la edición anterior.")) }
+                        store.update { it.copy(syncIssues = it.syncIssues + (id to tr(R.string.tr_546))) }
                         continue
                     }
                     val remote = cancellableApiCall { api.remoteProgress(id) }
@@ -138,10 +138,10 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
             }
             if (includeBookmarks) BookmarkSync(store, api).sync()
             store.update { it.copy(lastSync = System.currentTimeMillis(), syncMessage =
-                if (it.pending.isEmpty() && it.syncIssues.isEmpty() && it.bookmarkIssues.isEmpty() && it.bookmarks.none { b -> b.dirty }) "Todo sincronizado" else "Hay progreso pendiente o avisos por revisar") }
+                if (it.pending.isEmpty() && it.syncIssues.isEmpty() && it.bookmarkIssues.isEmpty() && it.bookmarks.none { b -> b.dirty }) tr(R.string.tr_547) else tr(R.string.tr_548)) }
         } catch (e: kotlinx.coroutines.CancellationException) { throw e
         } catch (e: Exception) {
-            store.update { it.copy(syncMessage = if (e is ApiError) e.message.orEmpty() else if (e is IllegalStateException) e.message.orEmpty() else "Sin conexión con Kavita. Progreso guardado en este dispositivo.") }
+            store.update { it.copy(syncMessage = if (e is ApiError) e.message.orEmpty() else if (e is IllegalStateException) e.message.orEmpty() else tr(R.string.tr_549)) }
             throw e
         }
     } }
@@ -151,7 +151,7 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
         val remote = cancellableApiCall { api(key).remoteProgress(id) }
         if (!remote.samePosition(observed) || remote.lastModifiedUtc != observed.lastModifiedUtc) {
             store.update { s -> s.copy(pending = s.pending.mapValues { (k,v) -> if(k == id) v.copy(conflict = remote) else v }) }
-            error("La posición del servidor volvió a cambiar. Revisa el conflicto de nuevo.")
+            error(tr(R.string.tr_550))
         }
         store.update { s ->
             if (s.pending[id]?.revision != pending.revision) s
@@ -165,7 +165,7 @@ class Repository(val context: Context, val vault: SessionVault = Vault(context))
                 val b = s.bookmarks.find { it.id == id && it.conflict } ?: return@update s
                 if (keepLocalCopy && !b.deleted && s.chapters[b.chapterId]?.epub == true) {
                     val copy = b.copy(id = java.util.UUID.randomUUID().toString(),
-                        title = b.title.take(65) + " (móvil ${java.util.UUID.randomUUID().toString().take(8)})",
+                        title = b.title.take(65) + tr(R.string.tr_551, java.util.UUID.randomUUID().toString().take(8)),
                         remote = null, conflict = false, error = null, revision = b.revision + 1, restored = false)
                     s.copy(bookmarks = s.bookmarks.filterNot { it.id == id } + copy)
                 } else s.copy(bookmarks = s.bookmarks.filterNot { it.id == id })

@@ -1,28 +1,28 @@
-# Compilación y pruebas
+# Building and testing
 
-## Requisitos
+## Requirements
 
-JDK 17, Android SDK Platform 35, Build Tools 35.0.0, Platform Tools y acceso a Google Maven/Maven Central/Gradle. El wrapper usa Gradle 8.11.1; AGP 8.9.1; Kotlin 2.1.10. El proyecto puede abrirse en Android Studio compatible con AGP 8.9.1.
+JDK 17, Android SDK Platform 35, Build Tools 35.0.0, Platform Tools, and access to Google Maven, Maven Central and Gradle. The wrapper uses Gradle 8.11.1, AGP 8.9.1 and Kotlin 2.1.10. Use an Android Studio version compatible with AGP 8.9.1.
 
-Configura `JAVA_HOME` a tu JDK y `ANDROID_HOME` a tu SDK, o crea `local.properties` con `sdk.dir=/ruta/al/sdk` (en Windows usar barras `/`). No se distribuyen SDK ni claves.
+Set `JAVA_HOME` to your JDK and `ANDROID_HOME` to your SDK, or create an untracked `local.properties` containing `sdk.dir=/path/to/sdk` (use `/` on Windows). Neither SDKs nor keys are distributed.
 
 ```sh
 ./gradlew testDebugUnitTest lintDebug assembleDebug
 ```
 
-En Windows usa `gradlew.bat`. Resultado: `app/build/outputs/apk/debug/app-debug.apk`. Es una compilación de desarrollo: la firma debug local NO es la de las APK del mantenedor y no permite actualizar encima de ellas. Para producción configura firma propia de release sin publicar claves.
+Use `gradlew.bat` on Windows. Output: `app/build/outputs/apk/debug/app-debug.apk`. This is a development build: its local debug signature **is not necessarily the maintainer's signature** and cannot update an installation signed with another key. Configure your own stable release signing for production; never commit keys.
 
-## Pruebas instrumentadas
+## Instrumented tests
 
-Usa exclusivamente emulador/dispositivo desechable, sin cuentas ni descargas personales. API 35 es la referencia utilizada. Instala una voz TTS offline para pruebas de audio; concede los permisos solicitados por Android. Las pruebas usan fixtures y MockWebServer, no bibliotecas privadas. Algunas comprueban orientación, escala de fuente, animaciones y audio: no interactúes con el emulador durante su ejecución.
+Only use a disposable emulator/device without personal accounts or downloads. API 35 is the reference environment. Install an offline TTS voice for audio tests and grant requested Android permissions. Tests use fixtures and MockWebServer, not private libraries. Some change orientation, font scale, animations and audio: do not interact with the emulator during execution. Legacy regression tests use Spanish; language tests restore that setting afterwards.
 
-El actualizador verifica la firma de la APK de ensayo. Debe generarse con la misma clave debug que la app de esta máquina, **no** distribuir la clave de quien publicó la app:
+The updater checks the fixture APK's signature. Generate it using the same local debug key as this machine's app, **never distribute the publisher's key**:
 
 ```sh
 python3 scripts/prepare-update-fixture.py
 ./gradlew connectedDebugAndroidTest
 ```
 
-El generador crea una APK sintética sin código, paquete de la app y versión 100000; la copia a `androidTest/assets`. Nunca instalarla en un equipo personal. No se incluye en la APK principal ni en Git.
+The generator creates a synthetic code-free APK with the app's package and version 100000, under `androidTest/assets`. Never install it on a personal device. It is excluded from the main APK and Git.
 
-Informes: `app/build/reports/tests`, `app/build/reports/lint-results-debug.html` y `app/build/outputs/androidTest-results`. Para un cambio de documentación basta verificar enlaces; los cambios en descarga/sync/lector necesitan sus pruebas específicas y una comprobación de actualización conservando datos.
+Reports: `app/build/reports/tests`, `app/build/reports/lint-results-debug.html` and `app/build/outputs/androidTest-results`. Documentation-only changes need link checks; download/sync/reader changes require relevant regression tests and a data-preserving upgrade check.

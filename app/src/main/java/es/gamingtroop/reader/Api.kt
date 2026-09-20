@@ -34,7 +34,7 @@ class KavitaApi(private val vault: SessionVault, private val accountKey: String)
         }?.jsonObject?.get("key")?.jsonPrimitive?.contentOrNull.orEmpty()
         fun normalizeServer(value: String): String {
             val url = value.trim().trimEnd('/').toHttpUrl()
-            require(url.scheme == "https" && url.username.isEmpty() && url.password.isEmpty() && url.query == null && url.fragment == null) { "Usa una dirección HTTPS sin claves ni parámetros" }
+            require(url.scheme == "https" && url.username.isEmpty() && url.password.isEmpty() && url.query == null && url.fragment == null) { tr(R.string.tr_000) }
             return url.toString().trimEnd('/')
         }
         fun login(vault: SessionVault, server: String, username: String, password: String): Account {
@@ -43,18 +43,18 @@ class KavitaApi(private val vault: SessionVault, private val accountKey: String)
             val client = OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).callTimeout(30, TimeUnit.SECONDS).build()
             val req = Request.Builder().url("$base/api/Account/login").post(payload.toString().toRequestBody("application/json".toMediaType())).build()
             client.newCall(req).execute().use { r ->
-                if (!r.isSuccessful) throw ApiError(r.code, if (r.code == 401 || r.code == 400) "Usuario o contraseña no válidos" else "No se pudo iniciar sesión (HTTP ${r.code})")
+                if (!r.isSuccessful) throw ApiError(r.code, if (r.code == 401 || r.code == 400) tr(R.string.tr_001) else tr(R.string.tr_002, r.code))
                 val j = codec.parseToJsonElement(r.body!!.string()).jsonObject
                 fun value(k: String) = j[k]?.jsonPrimitive?.contentOrNull.orEmpty()
                 val a = Account(base, j["id"]!!.jsonPrimitive.int, value("username"), value("token"), value("refreshToken"),
                     j["roles"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList(), value("kavitaVersion"), imageKey(j))
-                require(a.token.isNotBlank() && a.id > 0) { "Respuesta de inicio de sesión incompatible" }
+                require(a.token.isNotBlank() && a.id > 0) { tr(R.string.tr_003) }
                 vault.save(a)
                 return a
             }
         }
     }
-    private fun account() = vault.read()?.takeIf { it.key == accountKey } ?: throw ApiError(401, "Vuelve a iniciar sesión para sincronizar")
+    private fun account() = vault.read()?.takeIf { it.key == accountKey } ?: throw ApiError(401, tr(R.string.tr_004))
     private fun refresh(previous: Account): Boolean = synchronized(refreshLock) {
         val current = account()
         if (current.token != previous.token) return@synchronized true
@@ -75,9 +75,9 @@ class KavitaApi(private val vault: SessionVault, private val accountKey: String)
         val current = account()
         if(current.imageAuthKey.isNotBlank()) return@synchronized current
         val user = codec.parseToJsonElement(text("api/Account")).jsonObject
-        require(user["id"]?.jsonPrimitive?.intOrNull == current.id) { "La cuenta cambió. Vuelve a iniciar sesión." }
+        require(user["id"]?.jsonPrimitive?.intOrNull == current.id) { tr(R.string.tr_005) }
         val key = imageKey(user)
-        if(key.isBlank()) throw ApiError(401, "Vuelve a iniciar sesión para recuperar el permiso de imágenes. Se conservan las descargas.")
+        if(key.isBlank()) throw ApiError(401, tr(R.string.tr_006))
         val latest = account()
         latest.copy(imageAuthKey = key).also(vault::save)
     }
@@ -95,7 +95,7 @@ class KavitaApi(private val vault: SessionVault, private val accountKey: String)
         val call = client.newCall(req.build())
         call.timeout().timeout(if(download) 120 else 30, TimeUnit.SECONDS)
         val res = call.execute()
-        if (res.code == 401 && retry) { res.close(); if (refresh(account)) return response(path, json, false, method, download, imageAuth); throw ApiError(401, "Sesión caducada: vuelve a entrar. Tus descargas y progreso siguen guardados.") }
+        if (res.code == 401 && retry) { res.close(); if (refresh(account)) return response(path, json, false, method, download, imageAuth); throw ApiError(401, tr(R.string.tr_010)) }
         if (!res.isSuccessful) {
             val code = res.code
             val fieldErrors = if(code == 400) runCatching {
@@ -104,10 +104,10 @@ class KavitaApi(private val vault: SessionVault, private val accountKey: String)
             res.close()
             val media = path.substringBefore('?').let { it.startsWith("api/Image/",true) || it.equals("api/Reader/image",true) }
             if(code == 400 && fieldErrors.any { it.equals("apiKey",true) } && media) {
-                throw ApiError(400, "La app aún no es compatible con la autenticación de imágenes de este Kavita (HTTP 400 · ${path.substringBefore('?')}). No borres la cola: el contenido y el progreso se conservan.")
+                throw ApiError(400, tr(R.string.tr_011, path.substringBefore('?')))
             }
             if(code == 403 && media && !imageAuth) return response(path,json,retry,method,download,true)
-            throw ApiError(code, when(code) { 401 -> "Es necesario iniciar sesión"; 403 -> "Tu cuenta no tiene permiso para esta operación"; 404 -> "El contenido ya no está disponible"; 400 -> "Solicitud no compatible con Kavita (HTTP 400 · ${path.substringBefore('?')})"; else -> "Error del servidor (HTTP $code)" })
+            throw ApiError(code, when(code) { 401 -> tr(R.string.tr_012); 403 -> tr(R.string.tr_013); 404 -> tr(R.string.tr_014); 400 -> tr(R.string.tr_015, path.substringBefore('?')); else -> tr(R.string.tr_016, code) })
         }
         return res
     }
@@ -123,17 +123,17 @@ class KavitaApi(private val vault: SessionVault, private val accountKey: String)
                 r.body!!.byteStream().use { input -> part.outputStream().use { output ->
                     val buffer = ByteArray(65536); var size = 0L
                     while (true) {
-                        if (Thread.currentThread().isInterrupted) throw IOException("Descarga cancelada")
+                        if (Thread.currentThread().isInterrupted) throw IOException(tr(R.string.tr_017))
                         val n = input.read(buffer); if (n < 0) break
-                        size += n; if (size > maxBytes) throw IllegalStateException("Se ha alcanzado el límite de tamaño de esta descarga")
-                        if (part.usableSpace < 32L * 1024 * 1024) throw IOException("No queda espacio suficiente")
+                        size += n; if (size > maxBytes) throw IllegalStateException(tr(R.string.tr_018))
+                        if (part.usableSpace < 32L * 1024 * 1024) throw IOException(tr(R.string.tr_019))
                         output.write(buffer, 0, n)
                     }
                     output.fd.sync()
                 } }
             }
-            check(part.length() > 0) { "Recurso vacío" }
-            check(part.renameTo(file)) { "No se pudo guardar la descarga" }
+            check(part.length() > 0) { tr(R.string.tr_020) }
+            check(part.renameTo(file)) { tr(R.string.tr_021) }
             return file.length()
         } finally { part.delete() }
     }

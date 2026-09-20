@@ -1,30 +1,30 @@
-# Bigme B751C · S Color · Android 14 · sistema 1.7.0
+# Bigme B751C · S Color · Android 14 · system 1.7.0
 
-## Identificación
+## Device identification
 
-Datos leídos de Acerca del dispositivo: modelo **B751C**, código **S Color**, Android **14**, sistema **1.7.0**. La variante comercial coincide con [B751C S del fabricante](https://store.bigme.vip/products/bigme-b751c-s-upgraded-7inch-color-ereder-with-android-14-os). La referencia inicial B7 queda corregida. No se conserva el número de serie.
+The reported About screen identifies **B751C**, **S Color**, Android **14**, system **1.7.0**. This corresponds to the manufacturer's [B751C S](https://store.bigme.vip/products/bigme-b751c-s-upgraded-7inch-color-ereder-with-android-14-os), correcting the initial B7 reference. No serial number is retained.
 
-La ficha oficial indica 7 pulgadas, 300 ppp en blanco/negro y 150 ppp en color. El tema recomendado es **Tinta electrónica color**; no se fuerza mayor saturación, blanco/negro binario ni un modo rápido. El texto negro, las líneas firmes y los estados con etiquetas se conservan en ambas variantes del tema.
+The official specification lists a 7-inch panel, 300 ppi monochrome and 150 ppi colour. **Colour e-ink** is the recommended profile; no saturation boost, binary threshold or fast mode is forced. Black text, strong lines and labelled states are preserved in both profiles.
 
-## Alpha21: soporte condicionado al firmware, no certificado
+## Conditional firmware support since alpha21 — not certified
 
-- La app comprueba las clases públicas del framework **xrz**, sin asumir que el nombre comercial o la versión Android bastan. No depende de que Build.MANUFACTURER diga Bigme: algunos modelos reportan alps.
-- Contrato exigido: clase pública `xrz.framework.manager.XrzEinkManager`, método público estático `void forceGlobalRefresh(int)` y campo público estático final `int EINK_CLEAN_MODE` de `xrz.framework.manager.EinkRefreshMode`.
-- No se adivina un modo numérico, no se recurre a GC16 de otro controlador si falta CLEAN, ni se habilitan APIs privadas. No hay comandos root, llamadas shell, permisos nuevos o cambios persistentes de modos del sistema.
-- **Refresco Bigme experimental** aparece solo si se encuentra ese contrato. Está desactivado inicialmente; activarlo autoriza solicitudes de limpieza durante la navegación. La detección por sí sola nunca llama a forceGlobalRefresh.
-- Si una llamada produce un error capturable, se desactiva la opción de forma persistente y vuelve a compatibilidad, sin reintentos en bucle. No se puede capturar desde Java un fallo fatal del propio código nativo del fabricante; por eso no se activa automáticamente basándose en la marca.
-- La opción es local al dispositivo y no se incluye en copias de lectura. Al cambiar el identificador de firmware/API de Android deja de estar activa. No requiere volver a iniciar sesión ni altera libros, zoom o progreso.
-- **Compatibilidad y refresco** muestra el estado; **Mi espacio → Diagnóstico** exporta solo estado, perfil, activación y contador de solicitudes aceptadas, no modelo, serial, identificador de compilación ni cuenta.
+- Checks the public **xrz** framework, rather than assuming the product name/Android version is sufficient. It does not require Build.MANUFACTURER to say Bigme; some models report alps.
+- Required contract: public `xrz.framework.manager.XrzEinkManager`, public static `void forceGlobalRefresh(int)`, and public static final integer `EINK_CLEAN_MODE` in `xrz.framework.manager.EinkRefreshMode`.
+- No guessed numeric modes, borrowed GC16 constants when CLEAN is missing, private API bypasses, root/shell commands, extra permissions or persistent system mode changes.
+- **Experimental Bigme refresh** appears only when the contract is found. It is initially disabled. Enabling it permits clean requests after navigation; detection itself never calls forceGlobalRefresh.
+- A catchable failure persistently disables it and falls back to compatibility redraw, without retry loops. Java cannot catch a fatal crash inside manufacturer native code, which is why brand detection never enables it automatically.
+- The option is device-local and excluded from reading backups. A changed firmware/API identity invalidates activation. No re-login is needed; books, zoom and progress are unaffected.
+- **Compatibility and refresh** displays detection status. **My space → Diagnostics** exports status, profile, activation and accepted-request count, not model, serial, build identifier or account.
 
-## Cómo comprobarlo en el lector
+## Checking on the device
 
-1. Actualizar encima a alpha21. En Ajustes → Tipo de pantalla elegir **Tinta electrónica color** y **Limpiar al navegar**.
-2. Si aparece **Refresco Bigme experimental**, activarlo y usar **Limpiar pantalla ahora**. Comparar páginas con texto e ilustraciones y abrir/cerrar menús. Desactivarlo si no mejora o no responde correctamente.
-3. Si no aparece, abrir **Compatibilidad y refresco** para ver si la API falta o está bloqueada. No se anuncia refresco nativo en ese caso; se mantiene el repintado compatible. Puede exportarse el diagnóstico sin datos personales.
-4. Revisar los modos de calidad y refresco completo por aplicación del propio Bigme, si están disponibles. Evitar combinar un modo rápido del sistema con la expectativa de imagen limpia; no se conocen los nombres exactos del menú del firmware 1.7.0.
+1. Update in place to alpha21 or later. Select **Settings → Screen type → Colour e-ink** and **Refresh after navigation**.
+2. If **Experimental Bigme refresh** appears, enable it and try **Refresh screen now**. Compare text/illustrated pages and open/close menus. Disable it if it does not improve results or behaves incorrectly.
+3. If unavailable, open **Compatibility and refresh** to see whether the API is missing/blocked. No native refresh is claimed in that case; compatibility redraw remains. Diagnostics can be exported without personal data.
+4. Review Bigme's own per-app quality/full-refresh settings if available. Do not combine fast mode with expectations of a perfectly clean image. Exact firmware 1.7.0 menu labels have not been verified.
 
-## Evidencia y límites
+## Evidence and limits
 
-Fuente de las firmas: [investigación comunitaria sobre HiBreak Plus, revisión fijada](https://github.com/imedwei/inksdk/blob/3373aa07506c0870ea229b9008cbb5fdbe8d706b/docs/bigme-sdk-reverse-engineered.md). No es un SDK oficial ni una prueba en B751C S. Que funcione desde UID shell no demuestra los permisos de una aplicación normal. La app comprueba el contrato y captura rechazos en su propio proceso, sin saltarse controles.
+API source: [community HiBreak Plus research, pinned revision](https://github.com/imedwei/inksdk/blob/3373aa07506c0870ea229b9008cbb5fdbe8d706b/docs/bigme-sdk-reverse-engineered.md). This is not an official SDK or a B751C S test. Working under shell UID does not prove a normal app has permission. The app checks the contract and handles rejections within its own process, without bypassing controls.
 
-Los tests automatizados usan un controlador simulado y un emulador sin API Bigme. Verifican exclusión por defecto, llamada simbólica, reversión, interfaz y conservación de datos, **no limpieza física ni ausencia de ghosting**. Aún no hay resultado de un panel B751C S real. Tampoco se deduce el modo de onda ejecutado a partir de una llamada void aceptada.
+Automated tests use a simulated controller and an emulator without the Bigme API. They verify default exclusion, symbolic invocation, fallback, UI and data preservation, **not physical cleaning or absence of ghosting**. No actual B751C S panel result has been recorded. An accepted void call does not reveal the waveform used.

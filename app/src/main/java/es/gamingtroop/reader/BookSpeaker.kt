@@ -19,7 +19,7 @@ class BookSpeaker(context: Context, private val store: Store, private val saved:
     var available by mutableStateOf(false); private set
     var utterancesStarted by mutableIntStateOf(0); private set
     var speaking by mutableStateOf(false); private set
-    var message by mutableStateOf("Preparando voz…"); private set
+    var message by mutableStateOf(tr(R.string.tr_042)); private set
     var rate by mutableFloatStateOf(1f); private set
     var timerMinutes by mutableIntStateOf(0); private set
     private val handler = Handler(Looper.getMainLooper())
@@ -48,15 +48,15 @@ class BookSpeaker(context: Context, private val store: Store, private val saved:
                 val voices = engine.voices.orEmpty().filter { !it.isNetworkConnectionRequired && "notInstalled" !in it.features.orEmpty() }
                 val voice = voices.firstOrNull { it.locale.language == "es" }
                     ?: voices.firstOrNull { it.locale.language == Locale.getDefault().language } ?: voices.firstOrNull()
-                if(voice != null) { engine.voice = voice; available = true; message = "Voz sin conexión · ${voice.locale.displayLanguage}" }
-                else message = "No hay una voz sin conexión instalada. Añádela en los ajustes de voz de Android."
-            } else message = "No hay un motor de voz disponible. Puedes configurarlo en Android."
+                if(voice != null) { engine.voice = voice; available = true; message = tr(R.string.tr_043, voice.locale.displayLanguage) }
+                else message = tr(R.string.tr_044)
+            } else message = tr(R.string.tr_045)
         } }
         engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(id: String?) { handler.post { if(id=="$generation" && !closed) utterancesStarted++ } }
             override fun onDone(id: String?) { handler.post { if(id == "$generation" && speaking && !closed) { chunk++; speakNext(generation) } } }
             @Deprecated("Deprecated in Java") override fun onError(id: String?) { handler.post {
-                if(id == "$generation" && !closed) { pause(); message = "No se pudo reproducir la voz. Comprueba el motor de Android." }
+                if(id == "$generation" && !closed) { pause(); message = tr(R.string.tr_047) }
             } }
         })
     }
@@ -64,7 +64,7 @@ class BookSpeaker(context: Context, private val store: Store, private val saved:
         if(!available || closed) return
         pause(); page = startPage.coerceIn(0,saved.chapter.pages-1); block = startBlock.coerceAtLeast(0); chunk = 0
         loadedPage = -1; chunks = emptyList()
-        if(audio.requestAudioFocus(focus) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) { message = "Otra aplicación está usando el audio. Vuelve a intentarlo."; return }
+        if(audio.requestAudioFocus(focus) != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) { message = tr(R.string.tr_048); return }
         if(!wake.isHeld) wake.acquire(4*60*60*1000L)
         speaking = true
         setTimer(timerMinutes)
@@ -80,8 +80,8 @@ class BookSpeaker(context: Context, private val store: Store, private val saved:
         job = scope.launch {
             try {
                 while(speaking && token == generation && !closed) {
-                    if(page >= saved.chapter.pages) { pause(); message = "Fin del libro. Puedes marcarlo como terminado en el lector."; return@launch }
-                    if(store.get().chapters[saved.chapter.id]?.hasPage(page)!=true) { pause();message="Esperando descarga de la siguiente sección. Reanuda cuando esté disponible.";return@launch }
+                    if(page >= saved.chapter.pages) { pause(); message = tr(R.string.tr_049); return@launch }
+                    if(store.get().chapters[saved.chapter.id]?.hasPage(page)!=true) { pause();message=tr(R.string.tr_050);return@launch }
                     if(loadedPage != page) {
                         blocks = withContext(Dispatchers.IO) { EpubText.blocks(File(store.chapterDir(saved.chapter.id),"$page.html").readText(),page) }
                         if(token != generation || closed) return@launch
@@ -93,18 +93,18 @@ class BookSpeaker(context: Context, private val store: Store, private val saved:
                     location(page,block)
                     engine.setSpeechRate(rate)
                     if(engine.speak(chunks[chunk],TextToSpeech.QUEUE_FLUSH,null,"$token") == TextToSpeech.ERROR) {
-                        pause(); message = "El motor de voz no pudo reproducir este párrafo."
+                        pause(); message = tr(R.string.tr_051)
                     }
                     return@launch
                 }
             } catch(e: CancellationException) { throw e }
-            catch(_: Exception) { pause(); message = "No se puede leer esta sección. Comprueba la descarga del libro." }
+            catch(_: Exception) { pause(); message = tr(R.string.tr_052) }
         }
     }
     fun speed(value: Float) { rate = value.coerceIn(.5f,2f); if(initialized) engine.setSpeechRate(rate) }
     fun setTimer(minutes: Int) {
         timerMinutes = minutes.coerceIn(0,60); timer?.cancel()
-        if(speaking && timerMinutes > 0) timer = scope.launch { delay(timerMinutes * 60000L); pause(); message = "Temporizador terminado" }
+        if(speaking && timerMinutes > 0) timer = scope.launch { delay(timerMinutes * 60000L); pause(); message = tr(R.string.tr_053) }
     }
     fun pause() {
         generation++; speaking = false; job?.cancel(); timer?.cancel()

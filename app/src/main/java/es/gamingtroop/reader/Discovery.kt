@@ -53,7 +53,7 @@ object DiscoveryJobs {
                 }
             } catch(e: CancellationException) { throw e }
             catch(_: Exception) { store.update { s -> s.followed[id]?.let {
-                s.copy(followed = s.followed + (id to it.copy(error = "No se pudo consultar esta obra. Puedes reintentar.")))
+                s.copy(followed = s.followed + (id to it.copy(error = tr(R.string.tr_086))))
             } ?: s } }
         }
         if(added > 0) notify(repo.context,store.get().followed.values.sumOf { it.unread.size })
@@ -61,12 +61,12 @@ object DiscoveryJobs {
     } }
     private fun notify(context: Context, count: Int) {
         val nm = context.getSystemService(NotificationManager::class.java)
-        nm.createNotificationChannel(NotificationChannel("new-chapters","Novedades de tus series",NotificationManager.IMPORTANCE_DEFAULT))
+        nm.createNotificationChannel(NotificationChannel("new-chapters",tr(R.string.tr_087),NotificationManager.IMPORTANCE_DEFAULT))
         val intent = Intent(context,MainActivity::class.java).putExtra("show_personal",true)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val pending = PendingIntent.getActivity(context,1700,intent,PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         try { nm.notify(1700,NotificationCompat.Builder(context,"new-chapters").setSmallIcon(android.R.drawable.ic_menu_info_details)
-            .setContentTitle("Novedades en tus series").setContentText("$count nuevos archivos de lectura · toca para verlos")
+            .setContentTitle(tr(R.string.tr_088)).setContentText(tr(R.string.tr_089, count))
             .setContentIntent(pending).setAutoCancel(true).build()) } catch(_: SecurityException) { }
     }
     suspend fun prepareNext(repo: Repository, key: String, currentId: Int): List<Int> = lock.withLock { withContext(Dispatchers.IO) {
@@ -87,14 +87,14 @@ object DiscoveryJobs {
             if(existing?.ready == true || existing?.inQueue == true || existing?.downloadRequestId == "removed") continue // Never revive an explicitly paused download.
             val size = cancellableApiCall { repo.api(key).text("api/Download/chapter-size?chapterId=${part.id}").trim().trim('"').toLongOrNull() }
             if(size == null || size <= 0 || size > remaining || size + 32L*1024*1024 > store.root.usableSpace) {
-                store.update { it.copy(smartMessage = "Siguiente tomo pendiente: tamaño desconocido o límite de espacio alcanzado. Puedes descargarlo manualmente.") }
+                store.update { it.copy(smartMessage = tr(R.string.tr_090)) }
                 break
             }
             repo.prepare(key,current.series,part)
             store.update { s -> s.copy(chapters = s.chapters + (part.id to s.chapters.getValue(part.id).copy(automatic=true))) }
             Jobs.download(repo.context,key,part.id,automatic=true); selected += part.id; remaining -= size
         }
-        if(selected.isNotEmpty()) store.update { it.copy(smartMessage = "Siguiente tomo preparado · ${selected.size} archivos en cola") }
+        if(selected.isNotEmpty()) store.update { it.copy(smartMessage = tr(R.string.tr_091, selected.size)) }
         selected
     } }
 }

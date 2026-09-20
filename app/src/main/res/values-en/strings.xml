@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tr_000" formatted="false">"Use an HTTPS address without keys or query parameters"</string>
+    <string name="tr_001" formatted="false">"Invalid username or password"</string>
+    <string name="tr_002" formatted="false">"Could not sign in (HTTP %1$s)"</string>
+    <string name="tr_003" formatted="false">"Unsupported sign-in response"</string>
+    <string name="tr_004" formatted="false">"Sign in again to sync"</string>
+    <string name="tr_005" formatted="false">"The account changed. Sign in again."</string>
+    <string name="tr_006" formatted="false">"Sign in again to restore image access. Your downloads are kept."</string>
+    <string name="tr_010" formatted="false">"Session expired: sign in again. Your downloads and progress are saved."</string>
+    <string name="tr_011" formatted="false">"The app does not yet support image authentication on this Kavita server (HTTP 400 · %1$s). Do not clear the queue: your content and progress are kept."</string>
+    <string name="tr_012" formatted="false">"You need to sign in"</string>
+    <string name="tr_013" formatted="false">"Your account does not have permission for this operation"</string>
+    <string name="tr_014" formatted="false">"This content is no longer available"</string>
+    <string name="tr_015" formatted="false">"Request not supported by Kavita (HTTP 400 · %1$s)"</string>
+    <string name="tr_016" formatted="false">"Server error (HTTP %1$s)"</string>
+    <string name="tr_017" formatted="false">"Download cancelled"</string>
+    <string name="tr_018" formatted="false">"This download has reached its size limit"</string>
+    <string name="tr_019" formatted="false">"Not enough free space"</string>
+    <string name="tr_020" formatted="false">"Empty resource"</string>
+    <string name="tr_021" formatted="false">"Could not save the download"</string>
+    <string name="tr_022" formatted="false">"App updates"</string>
+    <string name="tr_023" formatted="false">"Could not check for a new version. Check your connection and try again."</string>
+    <string name="tr_024" formatted="false">"Update superseded"</string>
+    <string name="tr_025" formatted="false">"Not enough space for the update"</string>
+    <string name="tr_026" formatted="false">"Download interrupted. You can retry; your reading data is safe."</string>
+    <string name="tr_027" formatted="false">"The file is not a valid APK"</string>
+    <string name="tr_028" formatted="false">"The APK does not match the published update"</string>
+    <string name="tr_029" formatted="false">"This version requires a newer Android version"</string>
+    <string name="tr_030" formatted="false">"This APK\'s signature does not match the installed app"</string>
+    <string name="tr_031" formatted="false">"No update available"</string>
+    <string name="tr_032" formatted="false">"The APK is no longer available or is invalid. Download it again."</string>
+    <string name="tr_033" formatted="false">"A newer update is available. Open the installer again."</string>
+    <string name="tr_035" formatted="false">"Update ready · tap to install"</string>
+    <string name="tr_036" formatted="false">"New version available"</string>
+    <string name="tr_037" formatted="false">"Bigme API not found"</string>
+    <string name="tr_038" formatted="false">"Unsupported Bigme API"</string>
+    <string name="tr_039" formatted="false">"Bigme refresh access blocked"</string>
+    <string name="tr_040" formatted="false">"Bigme API detected · experimental"</string>
+    <string name="tr_041" formatted="false">"The Bigme request failed; using compatibility redraw"</string>
+    <string name="tr_042" formatted="false">"Preparing speech…"</string>
+    <string name="tr_043" formatted="false">"Offline voice · %1$s"</string>
+    <string name="tr_044" formatted="false">"No offline voice is installed. Add one in Android\'s text-to-speech settings."</string>
+    <string name="tr_045" formatted="false">"No speech engine is available. You can configure one in Android."</string>
+    <string name="tr_047" formatted="false">"Could not play speech. Check the Android speech engine."</string>
+    <string name="tr_048" formatted="false">"Another app is using audio. Try again."</string>
+    <string name="tr_049" formatted="false">"End of book. You can mark it as finished in the reader."</string>
+    <string name="tr_050" formatted="false">"Waiting for the next section to download. Resume when it is available."</string>
+    <string name="tr_051" formatted="false">"The speech engine could not read this paragraph."</string>
+    <string name="tr_052" formatted="false">"Cannot read this section. Check the book download."</string>
+    <string name="tr_053" formatted="false">"Sleep timer finished"</string>
+    <string name="tr_054" formatted="false">"Unsupported bookmark response"</string>
+    <string name="tr_055" formatted="false">"This bookmark also changed or was deleted in Kavita. It has not been overwritten."</string>
+    <string name="tr_056" formatted="false">"Kavita did not confirm the bookmark deletion. The local change is still pending."</string>
+    <string name="tr_057" formatted="false">"Kavita did not confirm the device bookmark. It will be retried without losing it."</string>
+    <string name="tr_058" formatted="false">"The edition changed. Bookmarks are kept without moving them to another file."</string>
+    <string name="tr_059" formatted="false">"Bookmark from another edition; kept without syncing."</string>
+    <string name="tr_060" formatted="false">"Kavita did not confirm the bookmark deletion"</string>
+    <string name="tr_061" formatted="false">"Kavita did not confirm the new bookmark"</string>
+    <string name="tr_062" formatted="false">"Page %1$s"</string>
+    <string name="tr_063" formatted="false">"Could not sync bookmarks. They are kept on this device."</string>
+    <string name="tr_064" formatted="false">"Volume"</string>
+    <string name="tr_065" formatted="false">"Volume %1$s"</string>
+    <string name="tr_066" formatted="false">"%1$s · Part %2$s"</string>
+    <string name="tr_067" formatted="false">"Book"</string>
+    <string name="tr_069" formatted="false">" · Part"</string>
+    <string name="tr_070" formatted="false">"Volume "</string>
+    <string name="tr_071" formatted="false">"Continuous reader ready"</string>
+    <string name="tr_072" formatted="false">"Preparing reader"</string>
+    <string name="tr_073" formatted="false">"Cannot open page %1$s. Download this volume again."</string>
+    <string name="tr_074" formatted="false">"Could not display this page. Try Full page mode."</string>
+    <string name="tr_075" formatted="false">"End of volume"</string>
+    <string name="tr_076" formatted="false">"Waiting for more pages"</string>
+    <string name="tr_077" formatted="false">"The volume is marked as read when you tap Finished, not when the last image loads."</string>
+    <string name="tr_078" formatted="false">"%1$s/%2$s available · %3$s"</string>
+    <string name="tr_079" formatted="false">"Finished · continue"</string>
+    <string name="tr_080" formatted="false">"Kavita did not return a valid cover"</string>
+    <string name="tr_081" formatted="false">"Could not save the cover"</string>
+    <string name="tr_082" formatted="false">"Could not load the cover. Check your connection."</string>
+    <string name="tr_083" formatted="false">"No cover · %1$s"</string>
+    <string name="tr_084" formatted="false">"Cover · %1$s"</string>
+    <string name="tr_086" formatted="false">"Could not check this series. You can retry."</string>
+    <string name="tr_087" formatted="false">"Series updates"</string>
+    <string name="tr_088" formatted="false">"New content in your series"</string>
+    <string name="tr_089" formatted="false">"%1$s new reading files · tap to view"</string>
+    <string name="tr_090" formatted="false">"Next volume pending: unknown size or storage limit reached. You can download it manually."</string>
+    <string name="tr_091" formatted="false">"Next volume prepared · %1$s files queued"</string>
+    <string name="tr_092" formatted="false">"Screen type"</string>
+    <string name="tr_093" formatted="false">"Black text, white background and static controls. Page curl and continuous reading are suspended without deleting your settings."</string>
+    <string name="tr_094" formatted="false">"Refresh after navigation"</string>
+    <string name="tr_095" formatted="false">"Experimental Bigme refresh"</string>
+    <string name="tr_096" formatted="false">"Request a clean refresh from the Bigme controller. Enable it and try “Refresh screen now”. Disable it if it does not help. It is disabled after a firmware change."</string>
+    <string name="tr_097" formatted="false">"Bigme refresh requested after navigation; still needs checking on your screen."</string>
+    <string name="tr_098" formatted="false">"BOOX controller detected; panel refresh still needs checking."</string>
+    <string name="tr_099" formatted="false">"Compatibility redraw. Also enable full refresh in your device settings."</string>
+    <string name="tr_100" formatted="false">"Refresh screen now"</string>
+    <string name="tr_101" formatted="false">"Compatibility and refresh"</string>
+    <string name="tr_102" formatted="false">"E-ink refresh"</string>
+    <string name="tr_103" formatted="false">"Refreshing causes a deliberate flash and adds a delay. It runs after navigation or scrolling ends, not during the gesture. You can disable it without changing the theme."</string>
+    <string name="tr_104" formatted="false">"Controller unavailable"</string>
+    <string name="tr_105" formatted="false">"Uses Bigme\'s global refresh command with the mode supplied by its firmware. The community documented this API on another Bigme; it has not yet been validated on B751C S with system 1.7.0. Accepting the command does not prove it removes ghosting."</string>
+    <string name="tr_106" formatted="false">"A full refresh will be requested from the BOOX controller. Results depend on the firmware and must be checked on the reader."</string>
+    <string name="tr_107" formatted="false">"No compatible native controller is active. The entire window is redrawn with a black/white cycle; this does not guarantee a physical refresh. Also enable full refresh per page in your device settings."</string>
+    <string name="tr_108" formatted="false">"You can export detection status from My space → Diagnostics. It does not include a serial number or account details."</string>
+    <string name="tr_109" formatted="false">"Use Quality/Normal for text and images; A2/Fast may leave more ghosting. The app does not control the keyboard or Android dialogs. It does not change brightness or system settings."</string>
+    <string name="tr_110" formatted="false">"Original colours are preserved. Resolution, contrast and refresh time depend on the panel; not all colour devices use the same controller."</string>
+    <string name="tr_111" formatted="false">"Got it"</string>
+    <string name="tr_112" formatted="false">"Yes ✓"</string>
+    <string name="tr_113" formatted="false">"No"</string>
+    <string name="tr_115" formatted="false">"Close"</string>
+    <string name="tr_116" formatted="false">"Standard screen"</string>
+    <string name="tr_117" formatted="false">"Monochrome e-ink"</string>
+    <string name="tr_118" formatted="false">"Colour e-ink"</string>
+    <string name="tr_119" formatted="false">"Book not found"</string>
+    <string name="tr_120" formatted="false">"# Troop Reader notes\n\n"</string>
+    <string name="tr_121" formatted="false">" · section "</string>
+    <string name="tr_123" formatted="false">"Could not search the downloaded book."</string>
+    <string name="tr_124" formatted="false">"Wait until the section is ready."</string>
+    <string name="tr_125" formatted="false">"Long-press the text and select part of a paragraph before adding a note."</string>
+    <string name="tr_126" formatted="false">"Dictionary"</string>
+    <string name="tr_127" formatted="false">"Selected word or text"</string>
+    <string name="tr_128" formatted="false">"Choose an installed app to look up only this selection. Offline availability depends on its downloaded dictionaries."</string>
+    <string name="tr_129" formatted="false">"No compatible apps installed. Install a dictionary that supports Android\'s Process text action."</string>
+    <string name="tr_130" formatted="false">"Could not open this dictionary."</string>
+    <string name="tr_131" formatted="false">"Could not export notes."</string>
+    <string name="tr_132" formatted="false">"Search this book"</string>
+    <string name="tr_133" formatted="false">"Search text"</string>
+    <string name="tr_134" formatted="false">"Enter at least two characters. Searches all downloaded sections."</string>
+    <string name="tr_135" formatted="false">"%1$s matches"</string>
+    <string name="tr_136" formatted="false">" · showing the first 200"</string>
+    <string name="tr_137" formatted="false">"Section %1$s"</string>
+    <string name="tr_138" formatted="false">"Highlights and notes"</string>
+    <string name="tr_139" formatted="false">"Select text in the book and choose “Highlight / Note”, or use that action in Tools."</string>
+    <string name="tr_140" formatted="false">"Note from another edition"</string>
+    <string name="tr_141" formatted="false">"Go"</string>
+    <string name="tr_142" formatted="false">"Edit note"</string>
+    <string name="tr_143" formatted="false">"Delete"</string>
+    <string name="tr_144" formatted="false">"Export notes"</string>
+    <string name="tr_145" formatted="false">"Read aloud"</string>
+    <string name="tr_146" formatted="false">"Speed · %.2f×"</string>
+    <string name="tr_147" formatted="false">"Sleep timer"</string>
+    <string name="tr_148" formatted="false">"No limit"</string>
+    <string name="tr_150" formatted="false">"Pause"</string>
+    <string name="tr_151" formatted="false">"Resume"</string>
+    <string name="tr_152" formatted="false">"Read from here"</string>
+    <string name="tr_153" formatted="false">"From the start of the section"</string>
+    <string name="tr_154" formatted="false">"Uses an installed offline voice. Continues through the book\'s sections without marking it as finished. Keeps playing with the screen off. Pause using the notification or headphones. Pauses when audio focus is lost or headphones are disconnected."</string>
+    <string name="tr_155" formatted="false">"Open Android Settings → Text-to-speech to install a voice."</string>
+    <string name="tr_156" formatted="false">"Android speech settings"</string>
+    <string name="tr_157" formatted="false">"Back to book"</string>
+    <string name="tr_158" formatted="false">"Save highlight and note"</string>
+    <string name="tr_159" formatted="false">"Optional note"</string>
+    <string name="tr_160" formatted="false">"Save"</string>
+    <string name="tr_161" formatted="false">"Cancel"</string>
+    <string name="tr_162" formatted="false">"Book tools"</string>
+    <string name="tr_163" formatted="false">"OK"</string>
+    <string name="tr_164" formatted="false">"Your library.\nOffline, too."</string>
+    <string name="tr_165" formatted="false">"TROOP READER · FOR KAVITA"</string>
+    <string name="tr_166" formatted="false">"Kavita server"</string>
+    <string name="tr_167" formatted="false">"Username"</string>
+    <string name="tr_168" formatted="false">"Password"</string>
+    <string name="tr_169" formatted="false">"Could not connect securely. Check your server and connection."</string>
+    <string name="tr_170" formatted="false">"Open my library"</string>
+    <string name="tr_171" formatted="false">"Independent app · Alpha version\nYour password is not saved. Downloads stay on this device."</string>
+    <string name="tr_172" formatted="false">"Try the demo without an account"</string>
+    <string name="tr_173" formatted="false">"Could not connect. Downloaded content is still available."</string>
+    <string name="tr_174" formatted="false">"Could not load Kavita. Your downloads remain available; you can retry."</string>
+    <string name="tr_175" formatted="false">"Could not reach Kavita. Showing the saved catalogue."</string>
+    <string name="tr_178" formatted="false">"Refresh library"</string>
+    <string name="tr_179" formatted="false">"Settings"</string>
+    <string name="tr_180" formatted="false">"Library"</string>
+    <string name="tr_181" formatted="false">"Downloads"</string>
+    <string name="tr_182" formatted="false">"Progress"</string>
+    <string name="tr_183" formatted="false">"My space"</string>
+    <string name="tr_184" formatted="false">"Demo · sample data"</string>
+    <string name="tr_185" formatted="false">"Offline · your downloads are still available"</string>
+    <string name="tr_186" formatted="false">"Search library"</string>
+    <string name="tr_187" formatted="false">"All"</string>
+    <string name="tr_188" formatted="false">"Continue reading"</string>
+    <string name="tr_189" formatted="false">"Available offline"</string>
+    <string name="tr_190" formatted="false">"Partial reading · %1$s/%2$s"</string>
+    <string name="tr_191" formatted="false">"No results"</string>
+    <string name="tr_192" formatted="false">"Your library will appear here"</string>
+    <string name="tr_193" formatted="false">"Try another title or change the library filter."</string>
+    <string name="tr_194" formatted="false">"Connect to Kavita and tap refresh. Downloads do not need a connection."</string>
+    <string name="tr_195" formatted="false">"Downloaded"</string>
+    <string name="tr_197" formatted="false">"View %1$s"</string>
+    <string name="tr_198" formatted="false">"Download more"</string>
+    <string name="tr_199" formatted="false">"Reading progress"</string>
+    <string name="tr_200" formatted="false">"Priority: changes on this device"</string>
+    <string name="tr_201" formatted="false">"Priority: review conflicts"</string>
+    <string name="tr_202" formatted="false">"Last checked: %1$s"</string>
+    <string name="tr_203" formatted="false">"Sync now"</string>
+    <string name="tr_204" formatted="false">"No pending changes"</string>
+    <string name="tr_205" formatted="false">"You can keep reading offline. Your progress is saved here until you reconnect."</string>
+    <string name="tr_206" formatted="false">"Reading %1$s"</string>
+    <string name="tr_207" formatted="false">"Your local copy and progress are kept."</string>
+    <string name="tr_208" formatted="false">"Bookmarks · %1$s"</string>
+    <string name="tr_209" formatted="false">"Bookmark · %1$s"</string>
+    <string name="tr_210" formatted="false">"Pending deletion"</string>
+    <string name="tr_211" formatted="false">"Saved on this device · waiting to sync"</string>
+    <string name="tr_212" formatted="false">"The API does not report an edit timestamp. We do not pick a version based on when it was downloaded."</string>
+    <string name="tr_213" formatted="false">"Keep both"</string>
+    <string name="tr_214" formatted="false">"Keep Kavita version"</string>
+    <string name="tr_215" formatted="false">"Undo deletion"</string>
+    <string name="tr_216" formatted="false">"In Kavita: %1$s"</string>
+    <string name="tr_217" formatted="false">"Waiting to upload"</string>
+    <string name="tr_218" formatted="false">"On this device: %1$s · %2$s"</string>
+    <string name="tr_219" formatted="false">"Also changed on another device. Choose which position to keep."</string>
+    <string name="tr_220" formatted="false">"Keep device position"</string>
+    <string name="tr_221" formatted="false">"Keep Kavita position"</string>
+    <string name="tr_222" formatted="false">"Saved catalogue · open downloaded %1$s"</string>
+    <string name="tr_223" formatted="false">"Choose %1$s to read offline"</string>
+    <string name="tr_224" formatted="false">"Clear selection"</string>
+    <string name="tr_225" formatted="false">"Select all %1$s"</string>
+    <string name="tr_226" formatted="false">"Download (%1$s)"</string>
+    <string name="tr_227" formatted="false">"Already downloaded items are not downloaded again."</string>
+    <string name="tr_228" formatted="false">"Preparation stopped. Added items remain in Downloads."</string>
+    <string name="tr_229" formatted="false">"Stop batch preparation"</string>
+    <string name="tr_230" formatted="false">"Retry connection"</string>
+    <string name="tr_231" formatted="false">"%1$s pages/sections"</string>
+    <string name="tr_232" formatted="false">" · %1$s parts"</string>
+    <string name="tr_233" formatted="false">"Read"</string>
+    <string name="tr_234" formatted="false">"Read available content"</string>
+    <string name="tr_235" formatted="false">"Select %1$s"</string>
+    <string name="tr_236" formatted="false">"No %1$s loaded. If you are offline, open Downloads."</string>
+    <string name="tr_237" formatted="false">"Download selection"</string>
+    <string name="tr_238" formatted="false">"%1$s %2$s · %3$s pages/sections. They will be saved one at a time. "</string>
+    <string name="tr_239" formatted="false">"They will wait for an unmetered network. "</string>
+    <string name="tr_240" formatted="false">"They may use mobile data. "</string>
+    <string name="tr_241" formatted="false">"The final size depends on images and resources. You can pause each download."</string>
+    <string name="tr_242" formatted="false">"%1$s %2$s prepared · %3$s files queued"</string>
+    <string name="tr_243" formatted="false">"%1$s files not prepared: "</string>
+    <string name="tr_245" formatted="false">"The batch did not finish. Check Downloads before retrying."</string>
+    <string name="tr_246" formatted="false">"Add to downloads"</string>
+    <string name="tr_247" formatted="false">"version not reported"</string>
+    <string name="tr_249" formatted="false">"Download over Wi-Fi only"</string>
+    <string name="tr_250" formatted="false">"Wi-Fi only"</string>
+    <string name="tr_251" formatted="false">"Covers: %1$s notices"</string>
+    <string name="tr_252" formatted="false">"Free space on this device: %1$s"</string>
+    <string name="tr_253" formatted="false">"Wi-Fi only uses unmetered networks. Changes also apply to pending downloads without clearing the queue. Manually paused downloads remain paused. Progress can still sync over mobile data. Android may delay background work."</string>
+    <string name="tr_254" formatted="false">"Give this device priority"</string>
+    <string name="tr_255" formatted="false">"Device priority"</string>
+    <string name="tr_256" formatted="false">"Pending reading and bookmark changes in this app replace Kavita\'s, even if the web client is further ahead. With no local changes, changes from the web are received."</string>
+    <string name="tr_257" formatted="false">"If you also change a reading position or bookmark on the web, review the conflict before replacing it."</string>
+    <string name="tr_258" formatted="false">"Applies to subsequent sync operations."</string>
+    <string name="tr_259" formatted="false">"Sign out"</string>
+    <string name="tr_260" formatted="false">"Done"</string>
+    <string name="tr_261" formatted="false">"Downloads and %1$s pending reading positions will be kept for this account. Sign in again with the same username to access them."</string>
+    <string name="tr_268" formatted="false">"Pending"</string>
+    <string name="tr_269" formatted="false">"Removed from device"</string>
+    <string name="tr_270" formatted="false">"Not synced"</string>
+    <string name="tr_271" formatted="false">"Invalid EPUB resource"</string>
+    <string name="tr_272" formatted="false">"Unsupported EPUB resource path"</string>
+    <string name="tr_273" formatted="false">"The book contains external resources that cannot be downloaded safely"</string>
+    <string name="tr_274" formatted="false">"Resource path missing"</string>
+    <string name="tr_275" formatted="false">"Too many linked resources in the EPUB"</string>
+    <string name="tr_276" formatted="false">"Could not save the book resource"</string>
+    <string name="tr_278" formatted="false">"Recently read"</string>
+    <string name="tr_279" formatted="false">"Title A–Z"</string>
+    <string name="tr_280" formatted="false">"Largest first"</string>
+    <string name="tr_281" formatted="false">"All"</string>
+    <string name="tr_282" formatted="false">"In progress"</string>
+    <string name="tr_283" formatted="false">"Unread"</string>
+    <string name="tr_284" formatted="false">"Read downloads"</string>
+    <string name="tr_285" formatted="false">"All types"</string>
+    <string name="tr_286" formatted="false">"Could not complete the operation. Other downloads and your progress are kept."</string>
+    <string name="tr_287" formatted="false">"← All series"</string>
+    <string name="tr_288" formatted="false">"Your offline library"</string>
+    <string name="tr_289" formatted="false">"%1$s series · %2$s"</string>
+    <string name="tr_290" formatted="false">"%1$s %2$s · %3$s read"</string>
+    <string name="tr_291" formatted="false">"Search downloads"</string>
+    <string name="tr_292" formatted="false">"Applies to downloaded content, not the entire series in Kavita."</string>
+    <string name="tr_293" formatted="false">"Free up read items · %1$s"</string>
+    <string name="tr_294" formatted="false">"Delete all downloads"</string>
+    <string name="tr_295" formatted="false">"Delete series (%1$s)"</string>
+    <string name="tr_296" formatted="false">"Queue · %1$s pending"</string>
+    <string name="tr_297" formatted="false">"Hide queue"</string>
+    <string name="tr_298" formatted="false">"Show queue"</string>
+    <string name="tr_299" formatted="false">"Select entire queue"</string>
+    <string name="tr_300" formatted="false">"Clear queue"</string>
+    <string name="tr_301" formatted="false">"Pause entire queue"</string>
+    <string name="tr_302" formatted="false">"Pause selection"</string>
+    <string name="tr_303" formatted="false">"Retry pending downloads"</string>
+    <string name="tr_304" formatted="false">"Resume (%1$s)"</string>
+    <string name="tr_305" formatted="false">"Remove (%1$s)"</string>
+    <string name="tr_306" formatted="false">"Select download %1$s · %2$s"</string>
+    <string name="tr_307" formatted="false">"No downloaded series"</string>
+    <string name="tr_308" formatted="false">"No matches"</string>
+    <string name="tr_309" formatted="false">"Download from Library. Originals remain in Kavita."</string>
+    <string name="tr_310" formatted="false">"Try another title, type or reading status."</string>
+    <string name="tr_311" formatted="false">"Clear filters"</string>
+    <string name="tr_312" formatted="false">"Select series %1$s"</string>
+    <string name="tr_314" formatted="false">"Delete from device"</string>
+    <string name="tr_315" formatted="false">"Read / continue series"</string>
+    <string name="tr_316" formatted="false">"Select all"</string>
+    <string name="tr_317" formatted="false">"Delete selection (%1$s)"</string>
+    <string name="tr_318" formatted="false">"Delete entire series"</string>
+    <string name="tr_319" formatted="false">"Unread only"</string>
+    <string name="tr_320" formatted="false">"All downloaded volumes or books have been read."</string>
+    <string name="tr_321" formatted="false">"Incomplete download"</string>
+    <string name="tr_322" formatted="false">"Read again"</string>
+    <string name="tr_323" formatted="false">"Pause download"</string>
+    <string name="tr_324" formatted="false">"Retry download"</string>
+    <string name="tr_325" formatted="false">"Mark unread"</string>
+    <string name="tr_326" formatted="false">"Mark read"</string>
+    <string name="tr_327" formatted="false">"Remove %1$s downloads from the queue?"</string>
+    <string name="tr_328" formatted="false">"Delete the download only?"</string>
+    <string name="tr_329" formatted="false">"Selected partial files will be deleted, not completed downloads. Progress and bookmarks are kept."</string>
+    <string name="tr_330" formatted="false">"%1$s reading files will be deleted from this device, including selected completed downloads. Kavita originals, progress and bookmarks are kept."</string>
+    <string name="tr_331" formatted="false">"Remove from queue"</string>
+    <string name="tr_332" formatted="false">"Delete download"</string>
+    <string name="tr_333" formatted="false">"Favourite"</string>
+    <string name="tr_334" formatted="false">"Following"</string>
+    <string name="tr_335" formatted="false">"Follow updates"</string>
+    <string name="tr_336" formatted="false">"Add to collection"</string>
+    <string name="tr_337" formatted="false">"Collections · %1$s"</string>
+    <string name="tr_338" formatted="false">"New collection"</string>
+    <string name="tr_339" formatted="false">"Create and add"</string>
+    <string name="tr_340" formatted="false">"Could not open or save the file. Your data is safe."</string>
+    <string name="tr_341" formatted="false">"Backup saved. It does not contain passwords or book files."</string>
+    <string name="tr_342" formatted="false">"Notes exported as Markdown."</string>
+    <string name="tr_343" formatted="false">"Diagnostics exported. Nothing was sent automatically."</string>
+    <string name="tr_344" formatted="false">"Favourites"</string>
+    <string name="tr_345" formatted="false">"Collections"</string>
+    <string name="tr_346" formatted="false">"Updates"</string>
+    <string name="tr_347" formatted="false">"Statistics"</string>
+    <string name="tr_348" formatted="false">"Backups and notes"</string>
+    <string name="tr_349" formatted="false">"Kavita"</string>
+    <string name="tr_350" formatted="false">"Diagnostics"</string>
+    <string name="tr_351" formatted="false">"Technical diagnostics"</string>
+    <string name="tr_352" formatted="false">"Version, Android, download counts and HTTP codes. Does not include account, server, titles, text, notes, keys or full logs."</string>
+    <string name="tr_353" formatted="false">"Export diagnostics"</string>
+    <string name="tr_354" formatted="false">"Mark a series as a favourite from View volumes/books. You can access it here."</string>
+    <string name="tr_355" formatted="false">"Open series"</string>
+    <string name="tr_356" formatted="false">"Collection name"</string>
+    <string name="tr_357" formatted="false">"Create collection"</string>
+    <string name="tr_358" formatted="false">"Delete collection %1$s"</string>
+    <string name="tr_359" formatted="false">"Add series from their catalogue."</string>
+    <string name="tr_360" formatted="false">"Remove %1$s from collection"</string>
+    <string name="tr_361" formatted="false">"Follow a series from its catalogue. It is checked on opening and roughly every 12 hours; Android may delay this."</string>
+    <string name="tr_362" formatted="false">"%1$s updates detected"</string>
+    <string name="tr_363" formatted="false">"Check finished. Review each series for notices."</string>
+    <string name="tr_364" formatted="false">"Could not check Kavita. Retry when connected."</string>
+    <string name="tr_365" formatted="false">"Check for new content"</string>
+    <string name="tr_366" formatted="false">"You are not following any series yet."</string>
+    <string name="tr_367" formatted="false">"Waiting for the first check"</string>
+    <string name="tr_368" formatted="false">"%1$s new files to review"</string>
+    <string name="tr_370" formatted="false">"And %1$s more…"</string>
+    <string name="tr_371" formatted="false">"View series"</string>
+    <string name="tr_372" formatted="false">"Mark updates as seen"</string>
+    <string name="tr_373" formatted="false">"Unfollow"</string>
+    <string name="tr_374" formatted="false">"Save statistics on this device"</string>
+    <string name="tr_375" formatted="false">"%1$s minutes read"</string>
+    <string name="tr_376" formatted="false">"%1$s pages/sections visited"</string>
+    <string name="tr_377" formatted="false">"%1$s completed readings · %2$s active days"</string>
+    <string name="tr_378" formatted="false">"Counts from this version, only while the reader is open and visible. Visiting a page does not mean it has been read."</string>
+    <string name="tr_379" formatted="false">"%1$s · %2$s min · %3$s pages/sections"</string>
+    <string name="tr_380" formatted="false">"Clear statistics"</string>
+    <string name="tr_381" formatted="false">"Reading backup"</string>
+    <string name="tr_382" formatted="false">"Saves progress, bookmarks, notes, favourites, collections and settings. To restore on another device, sign in with the same account. Passwords and downloads are not included: books must be downloaded again."</string>
+    <string name="tr_383" formatted="false">"Export backup"</string>
+    <string name="tr_384" formatted="false">"Restore backup"</string>
+    <string name="tr_385" formatted="false">"%1$s saved highlights and notes"</string>
+    <string name="tr_386" formatted="false">"Export notes as Markdown"</string>
+    <string name="tr_387" formatted="false">"The backup contains your titles and annotations. Choose where to save it with Android\'s file picker."</string>
+    <string name="tr_388" formatted="false">"Delete collection"</string>
+    <string name="tr_389" formatted="false">"Deletes “%1$s”, not its books or progress."</string>
+    <string name="tr_390" formatted="false">"Clears local statistical history. Progress and bookmarks are unchanged."</string>
+    <string name="tr_391" formatted="false">"Clear"</string>
+    <string name="tr_392" formatted="false">"Restore reading data"</string>
+    <string name="tr_393" formatted="false">"%1$s reading files, %2$s bookmarks and %3$s notes. Missing data will be added; your current positions, notes and downloads are kept. Restored progress must be checked against Kavita."</string>
+    <string name="tr_394" formatted="false">"Backup restored. Review Progress; your current downloads are kept."</string>
+    <string name="tr_395" formatted="false">"Restore"</string>
+    <string name="tr_396" formatted="false">"Could not apply the setting"</string>
+    <string name="tr_397" formatted="false">"Next volume, ready to read"</string>
+    <string name="tr_398" formatted="false">"Prepare the next volume while reading"</string>
+    <string name="tr_399" formatted="false">"Automatic downloads over Wi-Fi only"</string>
+    <string name="tr_400" formatted="false">"Maximum storage for automatic downloads"</string>
+    <string name="tr_402" formatted="false">"Does not delete books or resume paused volumes. The limit only counts automatically downloaded files; downloads stop at the limit. The general Wi-Fi-only setting is also respected."</string>
+    <string name="tr_403" formatted="false">"Highlight / Note"</string>
+    <string name="tr_405" formatted="false">"Go to section"</string>
+    <string name="tr_406" formatted="false">"Go to page"</string>
+    <string name="tr_407" formatted="false">"Close selector"</string>
+    <string name="tr_408" formatted="false">"Pages"</string>
+    <string name="tr_409" formatted="false">"Search volumes or books"</string>
+    <string name="tr_410" formatted="false">"Clear filter"</string>
+    <string name="tr_411" formatted="false">"Search %1$s"</string>
+    <string name="tr_412" formatted="false">"No results in the saved catalogue"</string>
+    <string name="tr_413" formatted="false">"Current · "</string>
+    <string name="tr_414" formatted="false">"%1$s/%2$s parts downloaded"</string>
+    <string name="tr_415" formatted="false">"Partial download · you can start reading"</string>
+    <string name="tr_416" formatted="false">"Not downloaded"</string>
+    <string name="tr_417" formatted="false">"Part %1$s"</string>
+    <string name="tr_418" formatted="false">"Read"</string>
+    <string name="tr_419" formatted="false">"Page %1$s / %2$s"</string>
+    <string name="tr_420" formatted="false">"View %1$s / Download more"</string>
+    <string name="tr_421" formatted="false">"This book has no table of contents. You can select a section."</string>
+    <string name="tr_422" formatted="false">" · Current"</string>
+    <string name="tr_423" formatted="false">"Tap a thumbnail to open that page"</string>
+    <string name="tr_424" formatted="false">"Preview of page %1$s"</string>
+    <string name="tr_425" formatted="false">"The EPUB has %1$s sections; pagination changes with text size."</string>
+    <string name="tr_426" formatted="false">"Choose a page between 1 and %1$s."</string>
+    <string name="tr_427" formatted="false">"Section number"</string>
+    <string name="tr_428" formatted="false">"Page number"</string>
+    <string name="tr_429" formatted="false">"Enter a number between 1 and %1$s"</string>
+    <string name="tr_430" formatted="false">"Page not found"</string>
+    <string name="tr_431" formatted="false">"This section is not downloaded yet"</string>
+    <string name="tr_432" formatted="false">"Your progress is saved. Retry the download from Library."</string>
+    <string name="tr_433" formatted="false">"%1$s/%2$s available · %3$s. Your position is kept while the download continues."</string>
+    <string name="tr_434" formatted="false">"Read available content"</string>
+    <string name="tr_435" formatted="false">"Back to Downloads"</string>
+    <string name="tr_436" formatted="false">"Back"</string>
+    <string name="tr_437" formatted="false">"Search book"</string>
+    <string name="tr_438" formatted="false">"Bookmarks"</string>
+    <string name="tr_439" formatted="false">"Volumes and pages"</string>
+    <string name="tr_440" formatted="false">"Reading options"</string>
+    <string name="tr_441" formatted="false">"%1$s/%2$s downloaded · keep reading available content"</string>
+    <string name="tr_442" formatted="false">"Previous →"</string>
+    <string name="tr_443" formatted="false">"← Previous"</string>
+    <string name="tr_446" formatted="false">"← Next"</string>
+    <string name="tr_447" formatted="false">"Next →"</string>
+    <string name="tr_448" formatted="false">"Finished"</string>
+    <string name="tr_449" formatted="false">"Page ready"</string>
+    <string name="tr_450" formatted="false">"Loading page"</string>
+    <string name="tr_451" formatted="false">"Reader. Tap the centre to show controls and the edges to turn pages."</string>
+    <string name="tr_452" formatted="false">"Reader. Tap to show controls. Swipe to turn pages; when zoomed in, swipe from an edge of the image."</string>
+    <string name="tr_454" formatted="false">"Save settings for this series only"</string>
+    <string name="tr_455" formatted="false">"Reading preferences are saved for %1$s. Other series keep their settings."</string>
+    <string name="tr_456" formatted="false">"Using general settings. Enable this option to customise this series only."</string>
+    <string name="tr_457" formatted="false">"Reading mode"</string>
+    <string name="tr_458" formatted="false">"Full page"</string>
+    <string name="tr_459" formatted="false">"Fit width"</string>
+    <string name="tr_460" formatted="false">"Two pages"</string>
+    <string name="tr_461" formatted="false">"Continuous vertical"</string>
+    <string name="tr_462" formatted="false">"Continue with the next volume/book"</string>
+    <string name="tr_463" formatted="false">"Switch %1$s"</string>
+    <string name="tr_464" formatted="false">"Previous %1$s"</string>
+    <string name="tr_465" formatted="false">"Next %1$s"</string>
+    <string name="tr_466" formatted="false">"Switching volumes does not mark the current one as finished or skip volumes that have not been downloaded."</string>
+    <string name="tr_467" formatted="false">"Turn pages"</string>
+    <string name="tr_468" formatted="false">"Swipe"</string>
+    <string name="tr_469" formatted="false">"Tap edges"</string>
+    <string name="tr_470" formatted="false">"Scroll vertically to read. With edge taps enabled, they jump to the start of the previous or next page. The centre shows controls."</string>
+    <string name="tr_471" formatted="false">"Tap the left or right edge to turn pages, even while zoomed in. Tap the centre to show or hide controls. Drag to pan the enlarged image."</string>
+    <string name="tr_472" formatted="false">"Swipe horizontally to turn pages. When zoomed in, drag to pan; once at an edge, swipe outwards again to turn the page. Tap to show or hide controls."</string>
+    <string name="tr_473" formatted="false">"Edges respond when you lift your finger. Pinch or double-tap the centre to zoom. Manga reading direction is respected."</string>
+    <string name="tr_474" formatted="false">"Page turn effect"</string>
+    <string name="tr_475" formatted="false">"None"</string>
+    <string name="tr_476" formatted="false">"Page curl"</string>
+    <string name="tr_477" formatted="false">"Page curl only applies to the paged reader. Your choice is kept when you return to that mode."</string>
+    <string name="tr_478" formatted="false">"Page curl simulates a fold when moving forwards or backwards, with swipes or taps and while zoomed in. If Android disables animations, pages turn without effects."</string>
+    <string name="tr_479" formatted="false">"Turn pages with volume buttons"</string>
+    <string name="tr_480" formatted="false">"Volume − moves forwards; volume + moves backwards. During speech or with a dialog open, the buttons still control audio."</string>
+    <string name="tr_481" formatted="false">"Orientation"</string>
+    <string name="tr_482" formatted="false">"Automatic"</string>
+    <string name="tr_483" formatted="false">"Portrait"</string>
+    <string name="tr_484" formatted="false">"Landscape"</string>
+    <string name="tr_485" formatted="false">"Theme"</string>
+    <string name="tr_486" formatted="false">"Night"</string>
+    <string name="tr_487" formatted="false">"Sepia"</string>
+    <string name="tr_488" formatted="false">"Day"</string>
+    <string name="tr_489" formatted="false">"Text size · %1$s"</string>
+    <string name="tr_490" formatted="false">"Line spacing · %.1f"</string>
+    <string name="tr_491" formatted="false">"Margins"</string>
+    <string name="tr_492" formatted="false">"Serif font"</string>
+    <string name="tr_493" formatted="false">"Manga: right to left"</string>
+    <string name="tr_494" formatted="false">"Scroll up or down to read continuously. Edges and the selector jump to the start of a page. The position within the image is saved on this device. To zoom or use Page curl, switch back to Full page."</string>
+    <string name="tr_495" formatted="false">"Pinch with two fingers to zoom."</string>
+    <string name="tr_496" formatted="false">"Waiting for download"</string>
+    <string name="tr_497" formatted="false">"%1$s/%2$s pages or sections available. %3$s. Reading is not marked as finished."</string>
+    <string name="tr_498" formatted="false">"Continue here"</string>
+    <string name="tr_499" formatted="false">"Stay on this page"</string>
+    <string name="tr_500" formatted="false">"Could not open this page"</string>
+    <string name="tr_501" formatted="false">"The previous page and your progress are kept. Retry the page turn; if it keeps failing, download this volume again."</string>
+    <string name="tr_502" formatted="false">"Syncs with Kavita when connected. Changes on this device take priority."</string>
+    <string name="tr_503" formatted="false">"Syncs with Kavita when connected. Review conflicts in Progress."</string>
+    <string name="tr_504" formatted="false">"Bookmark this position"</string>
+    <string name="tr_505" formatted="false">"No bookmarks yet"</string>
+    <string name="tr_506" formatted="false">"Page %1$s · "</string>
+    <string name="tr_507" formatted="false">"Another edition"</string>
+    <string name="tr_508" formatted="false">"Conflict: review in Progress"</string>
+    <string name="tr_509" formatted="false">"Waiting to sync"</string>
+    <string name="tr_510" formatted="false">"Synced"</string>
+    <string name="tr_511" formatted="false">"Delete bookmark %1$s"</string>
+    <string name="tr_512" formatted="false">"Save bookmark"</string>
+    <string name="tr_513" formatted="false">"Bookmark name"</string>
+    <string name="tr_514" formatted="false">"Reading completed"</string>
+    <string name="tr_515" formatted="false">"Marked as read. "</string>
+    <string name="tr_516" formatted="false">"You can continue with %1$s."</string>
+    <string name="tr_517" formatted="false">"%1$s is not downloaded or has changed edition. Download it from Library to continue. No volumes are skipped."</string>
+    <string name="tr_518" formatted="false">"You have reached the end of this series\' saved catalogue."</string>
+    <string name="tr_519" formatted="false">"Continue reading"</string>
+    <string name="tr_520" formatted="false">"Back to library"</string>
+    <string name="tr_521" formatted="false">"Stay here"</string>
+    <string name="tr_523" formatted="false">"Restored data; review Progress before syncing"</string>
+    <string name="tr_524" formatted="false">"The backup exceeds the 16 MB size limit"</string>
+    <string name="tr_525" formatted="false">"The backup exceeds 16 MB"</string>
+    <string name="tr_526" formatted="false">"Unsupported backup format"</string>
+    <string name="tr_527" formatted="false">"This backup belongs to another server or user. Sign in with the original account."</string>
+    <string name="tr_529" formatted="false">"Comics"</string>
+    <string name="tr_530" formatted="false">"Books"</string>
+    <string name="tr_531" formatted="false">"Images"</string>
+    <string name="tr_532" formatted="false">"Light novels"</string>
+    <string name="tr_533" formatted="false">"Comics · ComicVine"</string>
+    <string name="tr_534" formatted="false">"Other reading"</string>
+    <string name="tr_535" formatted="false">"Unread"</string>
+    <string name="tr_536" formatted="false">"Library too large for this version"</string>
+    <string name="tr_537" formatted="false">"Select between 1 and 20,000 reading items per batch"</string>
+    <string name="tr_538" formatted="false">"Could not prepare this download. Check your connection."</string>
+    <string name="tr_539" formatted="false">"Sign in"</string>
+    <string name="tr_540" formatted="false">"Enable the Download permission for your user in Kavita"</string>
+    <string name="tr_541" formatted="false">"This item has no supported pages"</string>
+    <string name="tr_542" formatted="false">"The edition changed and you have pending progress. Resolve it before downloading the new edition."</string>
+    <string name="tr_543" formatted="false">"Close this reading session before changing editions"</string>
+    <string name="tr_544" formatted="false">"The file changed on the server. Check the edition before syncing."</string>
+    <string name="tr_545" formatted="false">"Kavita did not confirm the submitted position"</string>
+    <string name="tr_546" formatted="false">"The file changed in Kavita. The offline copy keeps the previous edition."</string>
+    <string name="tr_547" formatted="false">"Everything synced"</string>
+    <string name="tr_548" formatted="false">"There is pending progress or notices to review"</string>
+    <string name="tr_549" formatted="false">"No connection to Kavita. Progress saved on this device."</string>
+    <string name="tr_550" formatted="false">"The server position changed again. Review the conflict again."</string>
+    <string name="tr_551" formatted="false">" (device %1$s)"</string>
+    <string name="tr_552" formatted="false">"Could not reach Kavita. The last available copy is kept."</string>
+    <string name="tr_553" formatted="false">"Kavita lists and collections"</string>
+    <string name="tr_554" formatted="false">"Read-only server access and offline copies of what you open. Does not change your online lists or personal collections."</string>
+    <string name="tr_555" formatted="false">"Lists"</string>
+    <string name="tr_556" formatted="false">"Refresh from Kavita"</string>
+    <string name="tr_557" formatted="false">"No lists available in the current copy."</string>
+    <string name="tr_558" formatted="false">"Back to lists"</string>
+    <string name="tr_559" formatted="false">"Could not delete the download"</string>
+    <string name="tr_560" formatted="false">"Unsupported update catalogue"</string>
+    <string name="tr_561" formatted="false">"The update is incomplete or does not match the published file. Download it again."</string>
+    <string name="tr_562" formatted="false">"The update server is unavailable"</string>
+    <string name="tr_563" formatted="false">"Empty catalogue"</string>
+    <string name="tr_564" formatted="false">"Empty download"</string>
+    <string name="tr_565" formatted="false">"The download exceeds its published size"</string>
+    <string name="tr_566" formatted="false">"Could not save the update"</string>
+    <string name="tr_567" formatted="false">"Could not open the installer. Check permission or download the update again."</string>
+    <string name="tr_568" formatted="false">"You can allow installation and try again whenever you want."</string>
+    <string name="tr_569" formatted="false">"Updates"</string>
+    <string name="tr_570" formatted="false">"Installed version · %1$s"</string>
+    <string name="tr_571" formatted="false">"New version · %1$s"</string>
+    <string name="tr_572" formatted="false">"This version needs a newer Android version. You can keep using the installed version."</string>
+    <string name="tr_573" formatted="false">"Ready to install. Your downloads, progress and settings will be kept."</string>
+    <string name="tr_574" formatted="false">"Android will ask you to allow installations from Troop Reader. Then confirm the update in the installer."</string>
+    <string name="tr_575" formatted="false">"Open Android settings and allow Troop Reader to install apps."</string>
+    <string name="tr_576" formatted="false">"Install update"</string>
+    <string name="tr_577" formatted="false">"Allow and install"</string>
+    <string name="tr_578" formatted="false">"Downloading update · %1$s %"</string>
+    <string name="tr_579" formatted="false">"It will download automatically on an unmetered Wi-Fi network."</string>
+    <string name="tr_580" formatted="false">"Download now"</string>
+    <string name="tr_581" formatted="false">"You have the latest published version."</string>
+    <string name="tr_582" formatted="false">"Check for a new version of Troop Reader."</string>
+    <string name="tr_583" formatted="false">"Checking · connection required"</string>
+    <string name="tr_584" formatted="false">"Last checked: "</string>
+    <string name="tr_585" formatted="false">"Check for updates"</string>
+    <string name="tr_586" formatted="false">"Download updates over Wi-Fi"</string>
+    <string name="tr_587" formatted="false">"Automatic update downloads"</string>
+    <string name="tr_588" formatted="false">"Checks on opening the app and periodically in the background. Android may delay checks. Installation always requires confirmation and does not interrupt reading."</string>
+    <string name="tr_589" formatted="false">"Download update"</string>
+    <string name="tr_590" formatted="false">"%1$s will be downloaded using the current connection, including mobile data if Wi-Fi is unavailable."</string>
+    <string name="tr_591" formatted="false">"Download"</string>
+    <string name="tr_592" formatted="false">"Troop Reader · Read aloud"</string>
+    <string name="tr_593" formatted="false">"Playing"</string>
+    <string name="tr_594" formatted="false">"Paused"</string>
+    <string name="tr_595" formatted="false">"Section %1$s · %2$s"</string>
+    <string name="tr_596" formatted="false">"Stop"</string>
+    <string name="tr_597" formatted="false">"Reading downloads"</string>
+    <string name="tr_598" formatted="false">"Waiting for Wi-Fi"</string>
+    <string name="tr_599" formatted="false">"Queued"</string>
+    <string name="tr_600" formatted="false">"Download paused. You can resume it."</string>
+    <string name="tr_601" formatted="false">"Saving for offline reading · %1$s/%2$s"</string>
+    <string name="tr_602" formatted="false">"Your user needs download permission"</string>
+    <string name="tr_603" formatted="false">"The file changed. Delete the partial download and select it again."</string>
+    <string name="tr_604" formatted="false">"Unsupported page count"</string>
+    <string name="tr_605" formatted="false">"Automatic downloads disabled"</string>
+    <string name="tr_606" formatted="false">"Automatic download limit reached. Increase the limit or download manually."</string>
+    <string name="tr_607" formatted="false">"The session changed"</string>
+    <string name="tr_608" formatted="false">"Automatic download limit reached"</string>
+    <string name="tr_609" formatted="false">"Kavita did not provide a valid image. Retry the download."</string>
+    <string name="tr_610" formatted="false">"Downloading %1$s/%2$s"</string>
+    <string name="tr_611" formatted="false">"Waiting for connection"</string>
+    <string name="tr_612" formatted="false">"Download interrupted. Check your connection and retry."</string>
+    <string name="app_language">App language</string>
+    <string name="app_language_help">Changes the interface, not the language of your books or reading voice.</string>
+    <string name="books_lower">books</string>
+    <string name="volumes_lower">volumes</string>
+    <string name="page_word">Page</string>
+</resources>

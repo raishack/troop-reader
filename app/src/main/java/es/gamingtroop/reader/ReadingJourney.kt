@@ -1,9 +1,10 @@
 package es.gamingtroop.reader
 
 /** Library classification is supplied by Kavita; PDF is a format, not a library type. */
-enum class ReadingCategory(val label: String) {
-    MANGA("Manga"), COMIC("Cómics"), BOOK("Libros"), IMAGES("Imágenes"),
-    NOVEL("Novelas ligeras"), COMIC_VINE("Cómics · ComicVine"), OTHER("Otras lecturas")
+enum class ReadingCategory(private val labelId: Int) {
+    MANGA(0), COMIC((R.string.tr_529)), BOOK((R.string.tr_530)), IMAGES((R.string.tr_531)),
+    NOVEL((R.string.tr_532)), COMIC_VINE((R.string.tr_533)), OTHER((R.string.tr_534));
+    val label get() = if(labelId == 0) "Manga" else tr(labelId)
 }
 fun Series.category(libraries: List<Library>): ReadingCategory = when(libraries.find { it.id == libraryId }?.type) {
     0 -> ReadingCategory.MANGA; 1 -> ReadingCategory.COMIC; 2 -> ReadingCategory.BOOK
@@ -45,7 +46,7 @@ fun LocalState.hasStarted(chapter: Chapter): Boolean = position(chapter) > 0 ||
     !(pending[chapter.id]?.local ?: progress[chapter.id])?.bookScrollId.isNullOrBlank() ||
     (chapters[chapter.id]?.lastReadAt ?: 0) > 0
 fun ReadingUnit.readingLabel(state: LocalState): String = when {
-    isRead(state) -> "Leído"
-    chapters.any { state.hasStarted(it) } -> "En lectura"
-    else -> "Sin leer"
+    isRead(state) -> tr(R.string.tr_418)
+    chapters.any { state.hasStarted(it) } -> tr(R.string.tr_282)
+    else -> tr(R.string.tr_535)
 }
