@@ -2,6 +2,16 @@
 
 An independent **Kavita** client for Android, built for offline EPUB, manga, comics and PDF reading. **Spanish and English interface**, Kotlin and Jetpack Compose. Android 8.0+ (API 26), GPL-3.0. This is an alpha application, not an official Kavita app.
 
+## Screenshots
+
+Real app screenshots using the built-in offline demo, with synthetic books and covers. These show the **alpha22 development build** with the English interface; the latest published APK may differ. Tap a screenshot to view it full size.
+
+| Offline library | Reading options | E-ink settings |
+| :---: | :---: | :---: |
+| [<img src="docs/screenshots/library.png" width="240" alt="Troop Reader offline demo library with sample covers and continue-reading cards">](docs/screenshots/library.png) | [<img src="docs/screenshots/reading-options.png" width="240" alt="Reading options for screen type, page layout and navigation">](docs/screenshots/reading-options.png) | [<img src="docs/screenshots/eink-settings.png" width="240" alt="High-contrast e-ink settings with language selection and refresh controls">](docs/screenshots/eink-settings.png) |
+
+The sample book titles remain in Spanish: interface language does not translate book content. [Screenshot details](docs/screenshots/README.md).
+
 ## Install and connect
 
 1. Download the APK from [Releases](https://github.com/raishack/troop-reader/releases) or the [maintainer's update channel](https://claw.raishack.es/troop-reader/).
