@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="tr_000" formatted="false">"Use an HTTPS address without keys or query parameters"</string>
     <string name="tr_001" formatted="false">"Invalid username or password"</string>
@@ -88,8 +88,8 @@
     <string name="tr_092" formatted="false">"Screen type"</string>
     <string name="tr_093" formatted="false">"Black text, white background and static controls. Page curl and continuous reading are suspended without deleting your settings."</string>
     <string name="tr_094" formatted="false">"Refresh after navigation"</string>
-    <string name="tr_095" formatted="false">"Experimental Bigme refresh"</string>
-    <string name="tr_096" formatted="false">"Request a clean refresh from the Bigme controller. Enable it and try “Refresh screen now”. Disable it if it does not help. It is disabled after a firmware change."</string>
+    <string name="tr_095" formatted="false">"Native Bigme cleaning"</string>
+    <string name="tr_096" formatted="false">"Enable it and try “Refresh screen now”. A failure restores compatibility redraw. You must enable it again if the firmware or access route changes."</string>
     <string name="tr_097" formatted="false">"Bigme refresh requested after navigation; still needs checking on your screen."</string>
     <string name="tr_098" formatted="false">"BOOX controller detected; panel refresh still needs checking."</string>
     <string name="tr_099" formatted="false">"Compatibility redraw. Also enable full refresh in your device settings."</string>
@@ -98,11 +98,11 @@
     <string name="tr_102" formatted="false">"E-ink refresh"</string>
     <string name="tr_103" formatted="false">"Refreshing causes a deliberate flash and adds a delay. It runs after navigation or scrolling ends, not during the gesture. You can disable it without changing the theme."</string>
     <string name="tr_104" formatted="false">"Controller unavailable"</string>
-    <string name="tr_105" formatted="false">"Uses Bigme\'s global refresh command with the mode supplied by its firmware. The community documented this API on another Bigme; it has not yet been validated on B751C S with system 1.7.0. Accepting the command does not prove it removes ghosting."</string>
+    <string name="tr_105" formatted="false">"Requests cleaning through the Bigme firmware extension. Android must permit access to that API; an accepted request does not confirm the panel waveform or necessarily remove ghosting."</string>
     <string name="tr_106" formatted="false">"A full refresh will be requested from the BOOX controller. Results depend on the firmware and must be checked on the reader."</string>
     <string name="tr_107" formatted="false">"No compatible native controller is active. The entire window is redrawn with a black/white cycle; this does not guarantee a physical refresh. Also enable full refresh per page in your device settings."</string>
     <string name="tr_108" formatted="false">"You can export detection status from My space → Diagnostics. It does not include a serial number or account details."</string>
-    <string name="tr_109" formatted="false">"Use Quality/Normal for text and images; A2/Fast may leave more ghosting. The app does not control the keyboard or Android dialogs. It does not change brightness or system settings."</string>
+    <string name="tr_109" formatted="false">"Use a quality mode for text and images; fast modes can leave more ghosting. Troop Reader does not automatically change brightness, scaling or global parameters, and does not control the keyboard or Android dialogs."</string>
     <string name="tr_110" formatted="false">"Original colours are preserved. Resolution, contrast and refresh time depend on the panel; not all colour devices use the same controller."</string>
     <string name="tr_111" formatted="false">"Got it"</string>
     <string name="tr_112" formatted="false">"Yes ✓"</string>
@@ -587,4 +587,10 @@
     <string name="books_lower">books</string>
     <string name="volumes_lower">volumes</string>
     <string name="page_word">Page</string>
+<string name="bigme_native_settings" formatted="false">"Bigme quality and colour"</string>
+<string name="bigme_native_settings_help" formatted="false">"Opens the manufacturer’s e-ink centre for Troop Reader. Choose a profile there manually; opening it enables optimisation for this app and saves settings on the reader."</string>
+<string name="bigme_native_settings_error" formatted="false">"Could not request the e-ink centre. You can open it from the Bigme controls."</string>
+<string name="bigme_provider_refresh_help" formatted="false">"Requests native cleaning through the Bigme settings service, using the same command as its reader. The response only confirms submission: check the flash and ghosting on the screen."</string>
+<string name="bigme_native_panel_help" formatted="false">"“Bigme quality and colour” opens the manufacturer’s settings. The profile is selected manually and remains saved; it does not change automatically for each book. That panel can also change scaling or content brightness if you choose."</string>
+<string name="bigme_native_requests" formatted="false">"Native requests submitted: %1$s"</string>
 </resources>

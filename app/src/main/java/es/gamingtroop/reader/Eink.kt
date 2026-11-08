@@ -18,7 +18,9 @@ enum class DisplayMode(private val labelId: Int) {
     val eink get() = this != NORMAL
 }
 class DisplayPreferences(context: Context, private val firmware: String = "${Build.VERSION.SDK_INT}:${Build.DISPLAY}") {
+    internal val context = context.applicationContext
     private val prefs = context.applicationContext.getSharedPreferences("display",Context.MODE_PRIVATE)
+    private var route = BigmeRoute.FRAMEWORK
     var mode by mutableStateOf(runCatching { DisplayMode.valueOf(prefs.getString("mode","NORMAL")!!) }.getOrDefault(DisplayMode.NORMAL))
         private set
     var cleaning by mutableStateOf(prefs.getBoolean("cleaning",true)); private set
@@ -28,7 +30,16 @@ class DisplayPreferences(context: Context, private val firmware: String = "${Bui
     fun cleaning(value: Boolean) { cleaning=value; prefs.edit().putBoolean("cleaning",value).apply() }
     fun bigmeNative(value: Boolean) {
         bigmeNative=value
-        prefs.edit().apply { if(value) putString("bigmeFirmware",firmware) else remove("bigmeFirmware") }.apply()
+        prefs.edit().apply {
+            if(value) { putString("bigmeFirmware",firmware);putString("bigmeRoute",route.name) }
+            else { remove("bigmeFirmware");remove("bigmeRoute") }
+        }.apply()
+    }
+    internal fun bindBigmeRoute(value: BigmeRoute) {
+        route=value
+        // A previous opt-in for reflection must not silently activate another
+        // backend, even when the firmware ID is unchanged.
+        if(bigmeNative && prefs.getString("bigmeRoute",BigmeRoute.FRAMEWORK.name)!=value.name) bigmeNative(false)
     }
 }
 val LocalDisplayMode = staticCompositionLocalOf { DisplayMode.NORMAL }
@@ -70,15 +81,31 @@ class OnyxFullRefresh private constructor(private val repaint: java.lang.reflect
  * Jobs/decoders/scrolls coalesce; nothing runs with the app backgrounded.
  */
 class EinkRefresh internal constructor(private val prefs: DisplayPreferences,
-    private val bigme: BigmeProbe = BigmeFullRefresh.detect()) {
+    private val bigme: BigmeProbe = BigmeSystemBridge.detect(prefs.context) ?: BigmeFullRefresh.detect()) {
     private val handler=Handler(Looper.getMainLooper())
     private val windows=mutableListOf<ViewGroup>()
     private val draws=mutableMapOf<ViewGroup,ViewTreeObserver.OnDrawListener>()
+    private val focusListeners=mutableMapOf<ViewGroup,ViewTreeObserver.OnWindowFocusChangeListener>()
+    private var nativeSettingsOpen=false
+    init { prefs.bindBigmeRoute(bigme.route) }
     private var driver=OnyxFullRefresh.detect()
     var driverAvailable by mutableStateOf(driver!=null); private set
     var bigmeStatus by mutableStateOf(bigme.status); private set
     var nativeRequests by mutableStateOf(0); private set
-    fun diagnostic() = DisplayDiagnostic(prefs.mode,prefs.cleaning,bigmeStatus,prefs.bigmeNative,nativeRequests)
+    val bigmeRoute get() = bigme.route
+    val nativeSettingsAvailable get() = bigme.settings!=null
+    fun diagnostic() = DisplayDiagnostic(prefs.mode,prefs.cleaning,bigmeStatus,prefs.bigmeNative,nativeRequests,
+        if(bigme.driver!=null) bigme.route else null,nativeSettingsAvailable)
+    fun openNativeSettings(): Boolean {
+        if(!foreground || !nativeSettingsAvailable || nativeSettingsOpen) return false
+        cancel();nativeSettingsOpen=true
+        val submitted=bigme.settings?.invoke()==true
+        if(!submitted) { nativeSettingsOpen=false;request() }
+        return submitted
+    }
+    internal fun windowFocusChanged(focused: Boolean) {
+        if(focused) { nativeSettingsOpen=false;request() } else cancel()
+    }
     var requests=0; private set
     var completed=0; private set
     private var foreground=false
@@ -102,9 +129,9 @@ class EinkRefresh internal constructor(private val prefs: DisplayPreferences,
         paintedRoot=null; drawable=null; active=false; completed++
         if(pending) { handler.removeCallbacks(execute); handler.postDelayed(execute,220) }
     }
-    private fun eligible() = prefs.mode.eink && prefs.cleaning && foreground
+    private fun eligible() = prefs.mode.eink && prefs.cleaning && foreground && !nativeSettingsOpen
     fun foreground(value: Boolean) { foreground=value; if(value) request() else cancel() }
-    fun beginTouch() { touching=true; handler.removeCallbacks(execute) }
+    fun beginTouch() { nativeSettingsOpen=false;touching=true; handler.removeCallbacks(execute) }
     fun endTouch() { touching=false; request() }
     fun request(data: Boolean=false) {
         if(!eligible()) return
@@ -131,9 +158,16 @@ class EinkRefresh internal constructor(private val prefs: DisplayPreferences,
             }
         }
         draws[root]=listener;root.viewTreeObserver.addOnDrawListener(listener)
+        val focus=ViewTreeObserver.OnWindowFocusChangeListener { focused ->
+            // A system overlay does not necessarily pause this Activity. Do not
+            // repaint over native settings; own-window focus/touch resumes work.
+            windowFocusChanged(focused)
+        }
+        focusListeners[root]=focus;root.viewTreeObserver.addOnWindowFocusChangeListener(focus)
         request()
         return {
             draws.remove(root)?.let { if(root.viewTreeObserver.isAlive) root.viewTreeObserver.removeOnDrawListener(it) }
+            focusListeners.remove(root)?.let { if(root.viewTreeObserver.isAlive) root.viewTreeObserver.removeOnWindowFocusChangeListener(it) }
             windows.remove(root)
             if(paintedRoot===root) cancel()
             request()
@@ -164,6 +198,7 @@ class EinkRefresh internal constructor(private val prefs: DisplayPreferences,
     }
     fun dispose() {
         cancel();draws.forEach { (v,l) -> if(v.viewTreeObserver.isAlive) v.viewTreeObserver.removeOnDrawListener(l) }
-        draws.clear();windows.clear()
+        focusListeners.forEach { (v,l) -> if(v.viewTreeObserver.isAlive) v.viewTreeObserver.removeOnWindowFocusChangeListener(l) }
+        focusListeners.clear();draws.clear();windows.clear()
     }
 }

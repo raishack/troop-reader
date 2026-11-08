@@ -1,5 +1,15 @@
 # Validation and remaining limitations
 
+## Alpha23 development — public Bigme integration (2026-11-08)
+
+The public branch ports the native settings/cleaning integration from the local Spanish alpha22 device build while preserving bilingual resources and the existing released-reader callback guards. Version code 23 avoids distributing different bytes under the already installed local version code 22. No new APK release or update-feed change is part of this repository update.
+
+Local checks on the integrated public source passed **192 unit tests**, lint without errors, `assembleDebug` and `assembleDebugAndroidTest`. Resource/placeholder and enum-label tests cover Spanish and English. Targeted emulator coverage includes Bigme routing/failure/consent, explicit native-panel action, English native controls, e-ink behaviour and language switching; the targeted run finished with **16 Android tests passed** (6 Bigme, 6 e-ink, 4 language), for **208 distinct automated checks** including unit tests. It ran only on a disposable emulator.
+
+Physical evidence belongs to the equivalent local Spanish alpha22 integration: an ordinary targetSdk-35 probe confirmed the exported settings-provider query; the native panel was inspected for Troop Reader with HD 256 shown, and the owner confirmed that manual native cleaning returned to content. The bilingual alpha23 source has **not** been installed on that physical reader by this repository update. Colour/ghosting/latency improvements have not been quantified. No instrumented fixture tests ran on personal data.
+
+The app uses the public provider only after checking its system owner and typed capability reply. It does not bypass the reflection restriction or redistribute extracted system components. See [Bigme details](BIGME-B751C-S.md).
+
 ## Alpha22 — bilingual interface
 
 The language selector is available at sign-in and in Settings. Dedicated Android tests cover switching in both directions, reopening the app, preserving account state and English reader/e-ink controls. Unit tests verify resource placeholders, dynamic labels and compatibility with historical queue markers.
@@ -18,7 +28,7 @@ See [BUILD](BUILD.md). Generate the updater fixture with your own development ce
 
 The Kavita 0.9.1.4 rehearsal is described in [KAVITA-UPGRADE](KAVITA-UPGRADE.md). It validates API and connector compatibility, not a complete Android test run.
 
-## Still requires physical-device validation
+## Still requires broader physical-device validation
 
 - Bigme ghosting, latency and colour/monochrome contrast.
 - Large libraries, battery consumption and prolonged background downloads.

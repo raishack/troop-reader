@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="tr_000" formatted="false">"Usa una dirección HTTPS sin claves ni parámetros"</string>
     <string name="tr_001" formatted="false">"Usuario o contraseña no válidos"</string>
@@ -88,8 +88,8 @@
     <string name="tr_092" formatted="false">"Tipo de pantalla"</string>
     <string name="tr_093" formatted="false">"Texto negro, fondo blanco y controles estáticos. Hoja y lectura continua quedan suspendidos, sin borrar tus ajustes."</string>
     <string name="tr_094" formatted="false">"Limpiar al navegar"</string>
-    <string name="tr_095" formatted="false">"Refresco Bigme experimental"</string>
-    <string name="tr_096" formatted="false">"Solicita limpieza al controlador Bigme. Actívalo y prueba «Limpiar pantalla ahora». Desactívalo si no mejora. Se desactiva tras cambiar el firmware."</string>
+    <string name="tr_095" formatted="false">"Limpieza nativa Bigme"</string>
+    <string name="tr_096" formatted="false">"Actívala y prueba «Limpiar pantalla ahora». Si falla, vuelve al repintado compatible. Tendrás que activarla de nuevo si cambia el firmware o la vía de acceso."</string>
     <string name="tr_097" formatted="false">"Refresco Bigme solicitado al navegar; pendiente de comprobar en tu pantalla."</string>
     <string name="tr_098" formatted="false">"Controlador BOOX detectado; falta comprobar el refresco en el panel."</string>
     <string name="tr_099" formatted="false">"Repintado compatible. Activa también el refresco completo en los ajustes del lector."</string>
@@ -98,11 +98,11 @@
     <string name="tr_102" formatted="false">"Refresco de tinta electrónica"</string>
     <string name="tr_103" formatted="false">"La limpieza produce un destello deliberado y añade espera. Se realiza al terminar cada navegación o desplazamiento, no durante el gesto. Puedes desactivarla sin quitar el tema."</string>
     <string name="tr_104" formatted="false">"Controlador no disponible"</string>
-    <string name="tr_105" formatted="false">"Se usa la orden de limpieza global Bigme con el modo indicado por su firmware. La API está documentada por la comunidad en otro Bigme; no se ha validado aún en B751C S con sistema 1.7.0. Que acepte la orden no prueba que elimine el ghosting."</string>
+    <string name="tr_105" formatted="false">"Se solicita limpieza mediante la extensión de firmware Bigme. Depende de que Android permita esa API; una orden aceptada no confirma la onda del panel ni elimina necesariamente el ghosting."</string>
     <string name="tr_106" formatted="false">"Se solicitará refresco completo al controlador BOOX. El resultado depende del firmware y debe comprobarse en el lector."</string>
     <string name="tr_107" formatted="false">"No está activo un controlador nativo compatible. Se repinta toda la ventana con un ciclo negro/blanco; no garantiza un refresco físico. Activa también el refresco completo por página en los ajustes de tu lector."</string>
     <string name="tr_108" formatted="false">"Puedes exportar el estado de detección desde Mi espacio → Diagnóstico. No incluye número de serie ni datos de la cuenta."</string>
-    <string name="tr_109" formatted="false">"Usa Calidad/Normal para texto e imágenes; A2/Rápido puede dejar más residuos. La app no controla el teclado ni los diálogos de Android. No cambia brillo ni ajustes globales."</string>
+    <string name="tr_109" formatted="false">"Usa un modo de calidad para texto e imágenes; los modos rápidos pueden dejar más residuos. Troop Reader no modifica automáticamente brillo, escala ni parámetros globales, y no controla el teclado ni los diálogos de Android."</string>
     <string name="tr_110" formatted="false">"Se conservan los colores originales. Resolución, contraste y tiempos de refresco dependen del panel; no todos los dispositivos de color usan el mismo controlador."</string>
     <string name="tr_111" formatted="false">"Entendido"</string>
     <string name="tr_112" formatted="false">"Sí ✓"</string>
@@ -587,4 +587,10 @@
     <string name="books_lower">libros</string>
     <string name="volumes_lower">tomos</string>
     <string name="page_word">Página</string>
+<string name="bigme_native_settings" formatted="false">"Calidad y color del Bigme"</string>
+<string name="bigme_native_settings_help" formatted="false">"Abre el centro de tinta del fabricante para Troop Reader. Elige allí el perfil manualmente; al abrirlo se habilita la optimización de esta app y los ajustes se guardan en el lector."</string>
+<string name="bigme_native_settings_error" formatted="false">"No se pudo solicitar el centro de tinta. Puedes abrirlo desde los controles del Bigme."</string>
+<string name="bigme_provider_refresh_help" formatted="false">"Se solicita al servicio de ajustes del Bigme su limpieza nativa, la misma orden que usa su lector. La respuesta solo confirma el envío: comprueba el destello y el ghosting en la pantalla."</string>
+<string name="bigme_native_panel_help" formatted="false">"«Calidad y color del Bigme» abre los ajustes propios del fabricante. El perfil se selecciona manualmente y permanece guardado; no se cambia automáticamente según el libro. Ese panel puede modificar también la escala o el brillo del contenido si tú lo eliges."</string>
+<string name="bigme_native_requests" formatted="false">"Solicitudes nativas enviadas: %1$s"</string>
 </resources>

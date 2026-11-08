@@ -30,12 +30,12 @@ With **Refresh after navigation** enabled (the default inside e-ink profiles):
 
 1. A refresh is requested after navigation, page readiness, menu opening/closing, foregrounding or gesture completion. Cover loads are coalesced to avoid one flash per image. A stable draw is awaited (approximately 180–220 ms), not every frame.
 2. **Compatible BOOX:** tries `View.repaintEverything(int)` with full GC16 mode, reading constants from the firmware (`android.onyx.ViewUpdateHelper`). No guessed constants or A2/DU/fast modes. Manufacturer and API availability are checked. No root, global settings changes or Android restriction bypasses. Access failure falls back to compatibility mode.
-3. **Bigme, experimental and opt-in:** detects the public `xrz.framework.manager.XrzEinkManager.forceGlobalRefresh(int)` extension and `EinkRefreshMode.EINK_CLEAN_MODE`. Reads the mode from firmware; detection does not request refreshes. A compatible method/field makes **Experimental Bigme refresh** available, initially disabled. Once enabled, global cleaning is requested after navigation. A failure persistently disables it and uses compatibility redraw; a changed firmware identity requires opting in again. No root or global mode changes. Evidence comes from another Bigme: **not physically validated on B751C S / Android 14 / 1.7.0**. See [Bigme details](BIGME-B751C-S.md).
+3. **Bigme, opt-in:** first checks the manufacturer's public system-provider contract using a read-only capability query. **Native Bigme cleaning** requests its own cleaning operation; **Bigme quality and colour** explicitly opens native settings for manual, persistent adjustment. It is never opened during detection, and profiles do not switch automatically per book. The reflective xrz/CLEAN-mode route remains a conditional fallback, without guessed modes or access bypasses. Failures disable cleaning; changed firmware/access routes require new consent. Native panel opening/basic cleaning were checked on one B751C S / Android 14. See [details and limits](BIGME-B751C-S.md).
 4. **Other devices/API absent or disabled:** redraws the entire app window with black, white, then content (120 ms per phase in monochrome; 180 ms in colour). This is a compatibility aid, **not a guarantee of physical refresh or ghosting removal**. Zoom/progress are unchanged. It does not control the keyboard, Android dialogs or other apps.
 
 **Refresh screen now** uses the same mechanism. Cleaning can be disabled while retaining the theme. The intentional flash and delay are distinct from the accidental black-page bug fixed in alpha12. Refreshes do not repeat while idle or backgrounded; they are cancelled on pause, mode change or window closure.
 
-An accepted firmware call does not confirm the actual waveform. Emulators verify UI, requests and logic, **not physical refresh or ghosting**. The target Bigme B751C, S Color, Android 14, system 1.7.0 still needs physical verification. No certified hardware compatibility is claimed for BOOX, Bigme, Meebook, PocketBook or other manufacturers.
+An accepted firmware call does not confirm the actual waveform. Emulators verify UI, requests and logic, **not physical refresh or ghosting**. One B751C S / Android 14 owner confirmed native cleaning returned correctly to content, and the native panel was checked for Troop Reader. Quantitative ghosting/colour improvements remain unmeasured. No certified hardware compatibility is claimed for BOOX, Bigme, Meebook, PocketBook or other manufacturers.
 
 ## Device configuration
 
@@ -44,7 +44,7 @@ An accepted firmware call does not confirm the actual waveform. Emulators verify
 - Colour resolution, filters, front light and contrast vary. Do not apply binary thresholds to maps/illustrations or automatic saturation filters. The colour theme does not calibrate the panel.
 - Correct refresh timing depends on controller, panel technology, temperature and firmware. Compatibility timings are defaults, not electrical panel parameters.
 - Only devices running **Android 8+ apps** can install this APK. Standard Kindle/Kobo operating systems cannot.
-- No changes to front light, colour temperature, global brightness, system permissions or device battery management.
+- No automatic changes to front light, colour temperature, global brightness, scaling, permissions or power management. The explicitly opened manufacturer panel enables per-app optimisation and can change settings chosen by the user.
 
 ## Research references (2026-09-19)
 

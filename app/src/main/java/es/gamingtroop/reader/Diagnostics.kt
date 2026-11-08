@@ -12,6 +12,7 @@ object Diagnostics {
         display?.let { d -> putJsonObject("display") {
             put("mode",d.mode.name);put("cleaning",d.cleaning);put("bigmeApi",d.bigmeApi.name)
             put("bigmeEnabled",d.bigmeEnabled);put("nativeRequests",d.nativeRequests)
+            put("bigmeRoute",d.bigmeRoute?.name ?: "NONE");put("nativeSettingsAvailable",d.nativeSettingsAvailable)
         } }
         put("downloadCount",s.chapters.size);put("complete",s.chapters.values.count { it.ready })
         put("partial",s.chapters.values.count { !it.ready && it.downloadedPages>0 })

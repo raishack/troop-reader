@@ -130,6 +130,14 @@ import androidx.compose.ui.window.DialogWindowProvider
         }
         if(prefs.mode.eink) {
             Text(tr(R.string.tr_093),style=MaterialTheme.typography.bodySmall)
+            if(refresh?.nativeSettingsAvailable==true) {
+                var nativeSettingsError by remember { mutableStateOf(false) }
+                OutlinedButton(onClick={ nativeSettingsError=!refresh.openNativeSettings() }) {
+                    Text(tr(R.string.bigme_native_settings))
+                }
+                Text(tr(R.string.bigme_native_settings_help),style=MaterialTheme.typography.bodySmall)
+                if(nativeSettingsError) Text(tr(R.string.bigme_native_settings_error),style=MaterialTheme.typography.bodySmall)
+            }
             Row(verticalAlignment=Alignment.CenterVertically) {
                 Text(tr(R.string.tr_094),Modifier.weight(1f));DisplaySwitch(prefs.cleaning,prefs::cleaning)
             }
@@ -153,11 +161,15 @@ import androidx.compose.ui.window.DialogWindowProvider
                     Text(tr(R.string.tr_103))
                     Text(refresh?.bigmeStatus?.label ?: tr(R.string.tr_104))
                     Text(if(prefs.bigmeNative && refresh?.bigmeStatus==BigmeApiStatus.AVAILABLE)
-                        tr(R.string.tr_105)
+                        if(refresh.bigmeRoute==BigmeRoute.SYSTEM_PROVIDER)
+                            tr(R.string.bigme_provider_refresh_help)
+                        else tr(R.string.tr_105)
                     else if(refresh?.driverAvailable==true) tr(R.string.tr_106) else
                         tr(R.string.tr_107))
                     Text(tr(R.string.tr_108))
+                    if(refresh?.nativeSettingsAvailable==true) Text(tr(R.string.bigme_native_panel_help))
                     Text(tr(R.string.tr_109))
+                    if(refresh!=null) Text(tr(R.string.bigme_native_requests,refresh.nativeRequests))
                     if(prefs.mode==DisplayMode.COLOR) Text(tr(R.string.tr_110))
                 } },confirmButton={ TextButton(onClick={ help=false }) { Text(tr(R.string.tr_111)) } })
         }

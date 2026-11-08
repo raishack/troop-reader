@@ -25,15 +25,20 @@ class BigmeFlowTest {
     private val context: Context get()=ApplicationProvider.getApplicationContext()
     private var scenario: ActivityScenario<MainActivity>?=null
     private var calls=0
+    private var settingsCalls=0
     private lateinit var refresh: EinkRefresh
-    @Before fun reset() { context.getSharedPreferences("display",0).edit().clear().commit() }
-    @After fun close() { scenario?.close();context.getSharedPreferences("display",0).edit().clear().commit() }
-    private fun launch(status: BigmeApiStatus=BigmeApiStatus.AVAILABLE, succeeds: Boolean=true) {
+    @Before fun reset() { AppLanguage.select(context,"es");context.getSharedPreferences("display",0).edit().clear().commit() }
+    @After fun close() { scenario?.close();AppLanguage.select(context,"es");context.getSharedPreferences("display",0).edit().clear().commit() }
+    private fun launch(status: BigmeApiStatus=BigmeApiStatus.AVAILABLE, succeeds: Boolean=true,
+        withSettings: Boolean=false, settingsSucceeds: Boolean=true) {
         context.getSharedPreferences("display",0).edit().putString("mode","COLOR").commit()
         scenario=ActivityScenario.launch(Intent(context,MainActivity::class.java))
         scenario!!.onActivity { a ->
             a.einkRefresh.dispose()
-            refresh=EinkRefresh(a.displayPreferences,BigmeProbe(status,if(status==BigmeApiStatus.AVAILABLE) RefreshRequest { calls++;succeeds } else null))
+            refresh=EinkRefresh(a.displayPreferences,BigmeProbe(status,
+                if(status==BigmeApiStatus.AVAILABLE) RefreshRequest { calls++;succeeds } else null,
+                if(withSettings) ({ settingsCalls++;settingsSucceeds }) else null,
+                if(withSettings) BigmeRoute.SYSTEM_PROVIDER else BigmeRoute.FRAMEWORK))
             a.einkRefresh=refresh;refresh.foreground(true)
             a.setContent { DisplayTheme(a.displayPreferences,refresh) {
                 Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState(),flingBehavior=displayFling())) { DisplaySettings() }
@@ -41,7 +46,7 @@ class BigmeFlowTest {
         }
         ui.waitForIdle()
     }
-    private fun toggle() = ui.onNodeWithContentDescription("Refresco Bigme experimental")
+    private fun toggle() = ui.onNodeWithContentDescription("Limpieza nativa Bigme")
     @Test fun nativeIsOptInAndCanBeDisabledWithoutLosingTheColorProfile() {
         launch();toggle().performScrollTo().assertIsOff();assertEquals(0,calls)
         toggle().performClick();ui.waitUntil(6000) { calls>0 }
@@ -64,7 +69,7 @@ class BigmeFlowTest {
     }
     @Test fun absentApiDoesNotOfferTheExperimentalSwitchAndHelpIsHonest() {
         launch(BigmeApiStatus.ABSENT)
-        ui.onNodeWithText("Refresco Bigme experimental").assertDoesNotExist()
+        ui.onNodeWithText("Limpieza nativa Bigme").assertDoesNotExist()
         ui.onNodeWithText("Compatibilidad y refresco").performScrollTo().performClick()
         ui.onNodeWithText(BigmeApiStatus.ABSENT.label).assertExists()
         ui.onNodeWithText("Entendido").assertIsDisplayed()
@@ -72,5 +77,32 @@ class BigmeFlowTest {
         val dir=java.io.File(InstrumentationRegistry.getArguments().getString("additionalTestOutputDir") ?: context.getExternalFilesDir(null)!!.path).apply { mkdirs() }
         java.io.File(dir,"alpha21-compatibility.png").outputStream().use { screenshot.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it) };screenshot.recycle()
         ui.onNodeWithText("Entendido").performClick();assertEquals(0,calls)
+    }
+    @Test fun nativePanelIsExplicitAndFailedSubmissionGivesAnActionableMessage() {
+        launch(withSettings=true,settingsSucceeds=false)
+        assertEquals(0,settingsCalls);assertEquals(0,calls)
+        ui.onNodeWithText("Calidad y color del Bigme").performScrollTo().performClick()
+        ui.onNodeWithText("No se pudo solicitar el centro de tinta. Puedes abrirlo desde los controles del Bigme.")
+            .performScrollTo().assertIsDisplayed()
+        assertEquals(1,settingsCalls);assertEquals(0,calls)
+    }
+    @Test fun providerRouteStillRequiresConsentAndExplainsSubmissionNotPanelConfirmation() {
+        launch(withSettings=true)
+        toggle().performScrollTo().assertIsOff()
+        assertEquals(0,calls);assertEquals(0,settingsCalls)
+        toggle().performClick();ui.waitUntil(6000) { calls>0 }
+        ui.onNodeWithText("Compatibilidad y refresco").performScrollTo().performClick()
+        ui.onNodeWithText("Se solicita al servicio de ajustes del Bigme su limpieza nativa, la misma orden que usa su lector. La respuesta solo confirma el envío: comprueba el destello y el ghosting en la pantalla.")
+            .performScrollTo().assertIsDisplayed()
+        assertEquals(0,settingsCalls)
+    }
+    @Test fun nativeControlsAndErrorsAreTranslatedInEnglish() {
+        AppLanguage.select(context,"en")
+        launch(withSettings=true,settingsSucceeds=false)
+        ui.onNodeWithContentDescription("Native Bigme cleaning").performScrollTo().assertIsOff()
+        ui.onNodeWithText("Bigme quality and colour").performScrollTo().performClick()
+        ui.onNodeWithText("Could not request the e-ink centre. You can open it from the Bigme controls.")
+            .performScrollTo().assertIsDisplayed()
+        assertEquals(1,settingsCalls);assertEquals(0,calls)
     }
 }

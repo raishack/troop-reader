@@ -2,6 +2,12 @@
 
 An independent **Kavita** client for Android, built for offline EPUB, manga, comics and PDF reading. **Spanish and English interface**, Kotlin and Jetpack Compose. Android 8.0+ (API 26), GPL-3.0. This is an alpha application, not an official Kavita app.
 
+## Current development
+
+**alpha23 source** adds a public Bigme system-service integration: an explicit **Bigme quality and colour** button and opt-in **Native Bigme cleaning**. It preserves both interface languages and the reader lifecycle fixes already in this repository. The equivalent integration was checked on a B751C S / Android 14 using a local Spanish alpha22 build: the native panel opened for Troop Reader and the owner confirmed cleaning returned correctly to the content. Ghosting reduction and colour accuracy have not been measured.
+
+The development version advances to avoid reusing the installed alpha22 version code for different APK bytes. This repository update does **not** publish an alpha23 APK or change the maintainer's update feed. See [Bigme support](docs/BIGME-B751C-S.md) and [validation](docs/VALIDATION.md).
+
 ## Screenshots
 
 Real app screenshots using the built-in offline demo, with synthetic books and covers. These show the **alpha22 development build** with the English interface; the latest published APK may differ. Tap a screenshot to view it full size.
@@ -10,7 +16,7 @@ Real app screenshots using the built-in offline demo, with synthetic books and c
 | :---: | :---: | :---: |
 | [<img src="docs/screenshots/library.png" width="240" alt="Troop Reader offline demo library with sample covers and continue-reading cards">](docs/screenshots/library.png) | [<img src="docs/screenshots/reading-options.png" width="240" alt="Reading options for screen type, page layout and navigation">](docs/screenshots/reading-options.png) | [<img src="docs/screenshots/eink-settings.png" width="240" alt="High-contrast e-ink settings with language selection and refresh controls">](docs/screenshots/eink-settings.png) |
 
-The sample book titles remain in Spanish: interface language does not translate book content. [Screenshot details](docs/screenshots/README.md).
+The sample book titles remain in Spanish: interface language does not translate book content. These earlier screenshots do not show the newer native Bigme controls. [Screenshot details](docs/screenshots/README.md).
 
 ## Install and connect
 
@@ -34,7 +40,7 @@ Future versions from the original channel are detected under **Settings → App 
 - EPUB: local search, exportable highlights/notes, dictionary through a compatible app and background offline text-to-speech.
 - Optional volume-button navigation, orientation lock, statistics, reading backups and diagnostic exports.
 - Read-only Kavita lists/collections with offline caching.
-- [Monochrome and colour e-ink modes](docs/EINK.md), including [experimental Bigme refresh](docs/BIGME-B751C-S.md).
+- [Monochrome and colour e-ink modes](docs/EINK.md), including [Bigme native settings and opt-in cleaning](docs/BIGME-B751C-S.md).
 
 ## Documentation
 
@@ -54,7 +60,7 @@ Kavita does not provide conditional writes for all reading data. Conflict detect
 
 Speech needs an installed offline engine/voice. Dictionary lookup needs an app supporting Android's Process text action. There is no OCR, manga/PDF text search, remote list editing or complete SSO/2FA support.
 
-An emulator cannot validate ghosting on a physical e-ink panel. Bigme refresh is opt-in and remains physically unverified on B751C S / Android 14 / firmware 1.7.0. A black/white redraw does not guarantee a full panel refresh.
+An emulator cannot validate ghosting on a physical e-ink panel. Native panel opening and basic cleaning have been checked on one B751C S / Android 14; ghosting/colour improvements have not been measured. Cleaning remains opt-in. A black/white redraw does not guarantee a full panel refresh.
 
 ## Quick development setup
 

@@ -1,30 +1,46 @@
-# Bigme B751C · S Color · Android 14 · system 1.7.0
+# Bigme B751C S: native settings and cleaning
 
-## Device identification
+## Scope and observed behaviour
 
-The reported About screen identifies **B751C**, **S Color**, Android **14**, system **1.7.0**. This corresponds to the manufacturer's [B751C S](https://store.bigme.vip/products/bigme-b751c-s-upgraded-7inch-color-ereder-with-android-14-os), correcting the initial B7 reference. No serial number is retained.
+The target was identified commercially as B751C / S Color, Android 14, with system 1.7.0 on the earlier About screen. The inspected Android build reports Bigme / HiBreak / mt6765, a 1264×1680 screen and build `Bigme_V1.020260518`. Internal names alone do not identify the panel or prove API compatibility. No serial number is needed or retained by the app.
 
-The official specification lists a 7-inch panel, 300 ppi monochrome and 150 ppi colour. **Colour e-ink** is the recommended profile; no saturation boost, binary threshold or fast mode is forced. Black text, strong lines and labelled states are preserved in both profiles.
+On 8 November 2026, system apps/framework were inspected locally. An ordinary permission-free probe targeting API 35 could load xrz classes but not reflect their control members or `View/Window/SurfaceView.setRefreshMode`: Android reported hidden-API access denied. Public Java visibility and success as shell UID do **not** prove access from a normal app.
 
-## Conditional firmware support since alpha21 — not certified
+The exported settings provider could be queried by that same ordinary app. The resulting integration was installed in place as a local Spanish alpha22 build. The manufacturer's panel opened for **Troop Reader**, showing **HD 256**, and the owner confirmed manual native cleaning returned correctly to the content. This is a functional check on one device, **not** a measurement of colour accuracy, ghosting or latency.
 
-- Checks the public **xrz** framework, rather than assuming the product name/Android version is sufficient. It does not require Build.MANUFACTURER to say Bigme; some models report alps.
-- Required contract: public `xrz.framework.manager.XrzEinkManager`, public static `void forceGlobalRefresh(int)`, and public static final integer `EINK_CLEAN_MODE` in `xrz.framework.manager.EinkRefreshMode`.
-- No guessed numeric modes, borrowed GC16 constants when CLEAN is missing, private API bypasses, root/shell commands, extra permissions or persistent system mode changes.
-- **Experimental Bigme refresh** appears only when the contract is found. It is initially disabled. Enabling it permits clean requests after navigation; detection itself never calls forceGlobalRefresh.
-- A catchable failure persistently disables it and falls back to compatibility redraw, without retry loops. Java cannot catch a fatal crash inside manufacturer native code, which is why brand detection never enables it automatically.
-- The option is device-local and excluded from reading backups. A changed firmware/API identity invalidates activation. No re-login is needed; books, zoom and progress are unaffected.
-- **Compatibility and refresh** displays detection status. **My space → Diagnostics** exports status, profile, activation and accepted-request count, not model, serial, build identifier or account.
+The bilingual repository integrates these changes as **alpha23 development source**, preserving its translations and reader lifecycle fixes. This source update does not publish a new APK or update feed.
 
-## Checking on the device
+## Using the integration
 
-1. Update in place to alpha21 or later. Select **Settings → Screen type → Colour e-ink** and **Refresh after navigation**.
-2. If **Experimental Bigme refresh** appears, enable it and try **Refresh screen now**. Compare text/illustrated pages and open/close menus. Disable it if it does not improve results or behaves incorrectly.
-3. If unavailable, open **Compatibility and refresh** to see whether the API is missing/blocked. No native refresh is claimed in that case; compatibility redraw remains. Diagnostics can be exported without personal data.
-4. Review Bigme's own per-app quality/full-refresh settings if available. Do not combine fast mode with expectations of a perfectly clean image. Exact firmware 1.7.0 menu labels have not been verified.
+1. Choose **Settings → Screen type → Colour e-ink** (or Monochrome e-ink on an appropriate device).
+2. **Bigme quality and colour** explicitly opens the manufacturer's e-ink centre for the foreground app. Select the profile there manually; changes persist in the system, not in a reading backup. Opening the panel itself enables manufacturer optimisation flags. Scaling/content-brightness controls can also be offered. The app never opens it during detection or chooses profiles automatically per book.
+3. For cleaning, enable **Refresh after navigation** and **Native Bigme cleaning**, then try **Refresh screen now**. Disable cleaning if the intentional flash is unwanted.
+4. **Compatibility and refresh** shows status and submitted-request count. Diagnostic exports add only route/availability enums, booleans and counts, not model/build identifiers, book names or accounts.
 
-## Evidence and limits
+Manufacturer labels can disagree with IDs/enum names: in the tested firmware `rb_magazine` was labelled “Comic” and showed HD 256, while `rb_comic` was labelled “Magazine”. Do not infer the visible profile/waveform from an enum name or assume the same labels on other firmware.
 
-API source: [community HiBreak Plus research, pinned revision](https://github.com/imedwei/inksdk/blob/3373aa07506c0870ea229b9008cbb5fdbe8d706b/docs/bigme-sdk-reverse-engineered.md). This is not an official SDK or a B751C S test. Working under shell UID does not prove a normal app has permission. The app checks the contract and handles rejections within its own process, without bypassing controls.
+## Public-provider contract
 
-Automated tests use a simulated controller and an emulator without the Bigme API. They verify default exclusion, symbolic invocation, fallback, UI and data preservation, **not physical cleaning or absence of ghosting**. No actual B751C S panel result has been recorded. An accepted void call does not reveal the waveform used.
+The independent adapter requires the enabled/exported `com.xrz.settings.provider.SettingProvider`, owned by the **system app** `com.xrz.settings`, at authority `com.xrz.SettingProvider`. A similarly named third-party provider is rejected. Package visibility is declared; no new permission, root, shell helper, SDK binary or hidden-API bypass is added.
+
+Only three fixed operations are allowed:
+
+| Operation | Purpose | When called |
+|---|---|---|
+| `isColorDevice` | Typed capability query; false is valid for monochrome | Detection only |
+| `setting_globalrefresh` | Manufacturer's native cleaning command | Opt-in navigation/manual cleaning |
+| `setting_einkcenter` | Native e-ink panel for the foreground app | Explicit button press only |
+
+The inspected provider returns `status=-1` even when executing an operation. A non-null reply is **submission**, not proof of a physical waveform, visible settings window or ghosting removal. Missing/malformed capability replies do not enable the route. Catchable cleaning failures disable it persistently and restore compatibility redraw without retry loops.
+
+Pending clean requests are cancelled/coalesced and suppressed while opening the native panel. Own-window focus/input resumes normal operation. There is no idle/background refresh loop. A changed firmware or access route requires new cleaning consent; reading/profile preferences are retained.
+
+## Framework fallback and limits
+
+Other firmware can still use the alpha21-style `XrzEinkManager.forceGlobalRefresh(int)` adapter when its runtime symbolic `EINK_CLEAN_MODE` is accessible. Detection never refreshes and no borrowed numeric waveform is guessed. When neither route works, compatibility redraw remains.
+
+The internal framework has representation/per-package policies, but the app does **not** bypass Android restrictions to change contrast, colour or quality automatically per EPUB/manga page. Manual control is delegated to the native panel. It does not automatically change brightness, DPI, waveform files or device power management.
+
+No manufacturer APKs/JARs/libraries, captures of personal reading content, signing keys or private operational history are distributed here.
+
+References: [manufacturer specification](https://store.bigme.vip/products/bigme-b751c-s-upgraded-7inch-color-ereder-with-android-14-os), [community xrz research](https://github.com/imedwei/inksdk/blob/33c71c9578007db3f2b3ee4767e63472b9802600/docs/bigme-sdk-reverse-engineered.md), [e-ink behaviour](EINK.md). Community research is not an official SDK and does not substitute for target-firmware tests.
