@@ -2,7 +2,7 @@
 
 ## Original channel
 
-Development main currently targets alpha23. A separate Spanish alpha22 build containing the Bigme integration was already installed locally on the test reader; do not reuse versionCode 22 for a different bilingual APK. Updating this source repository does not itself publish a GitHub Release, sign with the maintainer's key or move the update feed.
+Alpha23 (versionCode 23) is the bilingual Bigme release. A separate Spanish alpha22 build containing the Bigme integration was already installed locally on the test reader; versionCode 22 must not be reused for a different bilingual APK. Updating this source repository does not itself publish a GitHub Release, sign with the maintainer's key or move the update feed.
 
 The updater is restricted to `https://claw.raishack.es/troop-reader/` and requires the same package/signature, an increasing version, matching size and SHA-256. Creating a GitHub Release **does not update the app's feed by itself**. See [APP-UPDATES](APP-UPDATES.md).
 

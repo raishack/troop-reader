@@ -2,11 +2,11 @@
 
 An independent **Kavita** client for Android, built for offline EPUB, manga, comics and PDF reading. **Spanish and English interface**, Kotlin and Jetpack Compose. Android 8.0+ (API 26), GPL-3.0. This is an alpha application, not an official Kavita app.
 
-## Current development
+## Current release
 
-**alpha23 source** adds a public Bigme system-service integration: an explicit **Bigme quality and colour** button and opt-in **Native Bigme cleaning**. It preserves both interface languages and the reader lifecycle fixes already in this repository. The equivalent integration was checked on a B751C S / Android 14 using a local Spanish alpha22 build: the native panel opened for Troop Reader and the owner confirmed cleaning returned correctly to the content. Ghosting reduction and colour accuracy have not been measured.
+**alpha23** adds a public Bigme system-service integration: an explicit **Bigme quality and colour** button and opt-in **Native Bigme cleaning**. It preserves both interface languages and the reader lifecycle fixes already in this repository. The equivalent integration was checked on a B751C S / Android 14 using a local Spanish alpha22 build: the native panel opened for Troop Reader and the owner confirmed cleaning returned correctly to the content. Ghosting reduction and colour accuracy have not been measured.
 
-The development version advances to avoid reusing the installed alpha22 version code for different APK bytes. This repository update does **not** publish an alpha23 APK or change the maintainer's update feed. See [Bigme support](docs/BIGME-B751C-S.md) and [validation](docs/VALIDATION.md).
+Version code 23 avoids reusing the installed local alpha22 version code for different APK bytes. Download the maintainer-signed APK from [Releases](https://github.com/raishack/troop-reader/releases/tag/v0.1.0-alpha23) or the [update channel](https://claw.raishack.es/troop-reader/); source commits and CI artifacts alone do not update installed apps. See [Bigme support](docs/BIGME-B751C-S.md) and [validation](docs/VALIDATION.md).
 
 ## Screenshots
 
